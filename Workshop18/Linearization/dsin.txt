@@ -1,0 +1,3215 @@
+#1
+char Aclass(3,24)
+Adymosim
+1.4
+Modelica experiment file
+
+
+#    Experiment parameters
+double experiment(7,1)
+    6000                   # StartTime    Time at which integration starts
+                           #              (and linearization and trimming time)
+   12000                   # StopTime     Time at which integration stops
+       0                   # Increment    Communication step size, if > 0
+     500                   # nInterval    Number of communication intervals, if > 0
+  1.0000000000000000E-04   # Tolerance    Relative precision of signals for
+                           #              simulation, linearization and trimming
+       0                   # MaxFixedStep Maximum step size of fixed step size
+                           #              integrators, if > 0.0
+       8                   # Algorithm    Integration algorithm as integer (1...28)
+                           #
+                           #             | model|       |        | dense | state |
+                           # Algorithm   | typ  | stiff | order  | output| event |
+                           # ------------+------+-------+--------+-------+-------+
+                           #  1 | deabm  |  ode |   no  |  1-12  |  yes  |   no  |
+                           #  2 | lsode1 |  ode |   no  |  1-12  |  yes  |   no  |
+                           #  3 | lsode2 |  ode |  yes  |  1-5   |  yes  |   no  |
+                           #  4 | lsodar |  ode |  both |1-12,1-5|  yes  |  yes  |
+                           #  5 | dopri5 |  ode |   no  |   5    |   no  |   no  |
+                           #  6 | dopri8 |  ode |   no  |   8    |   no  |   no  |
+                           #  7 | grk4t  |  ode |  yes  |   4    |   no  |   no  |
+                           #  8 | dassl  |  dae |  yes  |  1-5   |  yes  |  yes  |
+                           #  9 | odassl | hdae |  yes  |  1-5   |  yes  |  yes  |
+                           # 10 | mexx   | hdae |   no  |  2-24  |   no  |   no  |
+                           # 11 | euler  |  ode |   no  |   1    |   no  |  yes  |
+                           # 12 | rkfix2 |  ode |   no  |   2    |   no  |  yes  |
+                           # 13 | rkfix3 |  ode |   no  |   3    |   no  |  yes  |
+                           # 14 | rkfix4 |  ode |   no  |   4    |   no  |  yes  |
+                           #>=14| others |  ode |yes/no |  2-5   |   yes |  yes  |
+                           # ---+--------+------+-------+--------+-------+-------+
+                           # euler and rkfix have fixed stepsize.
+
+
+#    Method tuning parameters
+double method(27,1)
+       1                   # grid     type of communication time grid, defined by
+                           #          = 1: equidistant points ("Increment/nInterval")
+                           #          = 2: vector of grid points ("tgrid")
+                           #          = 3: variable step integrator (automatically)
+                           #          = 4: model (call of "increment" in Dymola, e.g.
+                           #                      incr=Time > 2 then 0 else 0.1
+                           #                      dummy=increment(incr))
+                           #          grid = 1,3 is stopped by "StopTime"
+                           #          grid = 2   is stopped by "tgrid(last)"
+                           #          grid = 4   runs forever (stopped by model)
+       1                   # nt       Use every NT time instant, if grid = 3
+       3                   # dense    1/2/3 restart/step/interpolate GRID points
+       1                   # evgrid   0/1 do not/save event points in comm. time grid
+       1                   # evu      0/1 U-discontinuity does not/trigger events
+       0                   # evuord       U-discontinuity order to consider (0,1,...)
+       0                   # error    0/1/2 One message/warning/error messages
+       0                   # jac      0/1 Compute jacobian numerically/by BLOCKJ
+       0                   # xd0c     0/1 Compute/set XD0
+       0                   # f3       0/1 Ignore/use F3 of HDAE (= index 1)
+       0                   # f4       0/1 Ignore/use F4 of HDAE (= index 2)
+       0                   # f5       0/1 Ignore/use F5 of HDAE (= invar.)
+       0                   # debug    flags for debug information (1<<0 uses pdebug) 
+     100                   # pdebug       priority of debug information (1...100)
+       0                   # fmax     Maximum number of evaluations of BLOCKF, if > 0
+       0                   # ordmax   Maximum allowed integration order, if > 0
+       0                   # hmax     Maximum absolute stepsize, if > 0
+       0                   # hmin     Minimum absolute stepsize, if > 0 (use with care!)
+       0                   # h0       Stepsize to be attempted on first step, if > 0
+  2.0000000000000000E-14   # teps     Bound to check, if 2 equal time instants
+  1.0000000000000000E-10   # eveps    Hysteresis epsilon at event points
+      20                   # eviter   Maximum number of event iterations
+  9.9999999999999995E-07   # delaym   Minimum time increment in delay buffers
+       1                   # fexcep   0/1 floating exception crashes/stops dymosim
+       1                   # tscale   clock-time = tscale*simulation-time, if grid = 5
+                           #          > 1: simulation too slow
+                           #          = 1: simulation-time = real-time
+                           #          < 1: simulation too fast
+       1                   # shared   (not used)
+    2473                   # memkey   (not used)
+
+
+#    Output parameters
+int settings(13,1)
+ 0                         # lprec    0/1 do not/store result data in double
+ 1                         # lx       0/1 do not/store x  (state variables)
+ 1                         # lxd      0/1 do not/store xd (derivative of states)
+ 1                         # lu       0/1 do not/store u  (input     signals)
+ 1                         # ly       0/1 do not/store y  (output    signals)
+ 0                         # lz       0/1 do not/store z  (indicator signals)
+ 1                         # lw       0/1 do not/store w  (auxiliary signals)
+ 1                         # la       0/1 do not/store a  (alias     signals)
+ 0                         # lperf    0/1 do not/store performance indicators
+ 0                         # levent   0/1 do not/store event point
+ 1                         # lres     0/1 do not/store results on result file
+ 0                         # lshare   0/1 do not/store info data for shared memory on dsshare.txt
+ 1                         # lform    0/1 ASCII/Matlab-binary storage format of results
+                           #              (for simulation/linearization; not for trimming)
+
+
+#    Names of initial variables
+char initialName(764,72)
+system.p_ambient
+system.T_ambient
+system.g
+system.allowFlowReversal
+system.energyDynamics
+system.massDynamics
+system.substanceDynamics
+system.traceDynamics
+system.momentumDynamics
+system.m_flow_start
+system.p_start
+system.T_start
+system.use_eps_Re
+system.m_flow_nominal
+system.eps_m_flow
+system.dp_small
+system.m_flow_small
+tank.level
+tank.V
+tank.der(V)
+tank.height
+tank.crossArea
+tank.p_ambient
+tank.T_ambient
+tank.level_start
+tank.energyDynamics
+tank.massDynamics
+tank.substanceDynamics
+tank.traceDynamics
+tank.p_start
+tank.use_T_start
+tank.T_start
+tank.h_start
+tank.X_start[1]
+tank.medium.p
+tank.medium.d
+tank.medium.T
+tank.medium.der(T)
+tank.medium.X[1]
+tank.medium.u
+tank.medium.der(u)
+tank.medium.R
+tank.medium.MM
+tank.medium.preferredMediumStates
+tank.medium.standardOrderComponents
+tank.medium.T_degC
+tank.medium.p_bar
+tank.U
+tank.der(U)
+tank.m
+tank.der(m)
+tank.mb_flow
+tank.Hb_flow
+tank.Qb_flow
+tank.Wb_flow
+tank.initialize_p
+tank.nPorts
+tank.ports[1].p
+tank.ports[1].der(p)
+tank.ports[1].h_outflow
+tank.ports[1].der(h_outflow)
+tank.ports[2].p
+tank.ports[2].der(p)
+tank.use_portsData
+tank.portsData[1].diameter
+tank.portsData[1].height
+tank.portsData[1].zeta_out
+tank.portsData[1].zeta_in
+tank.portsData[2].diameter
+tank.portsData[2].height
+tank.portsData[2].zeta_out
+tank.portsData[2].zeta_in
+tank.m_flow_nominal
+tank.m_flow_small
+tank.use_Re
+tank.ports_H_flow[1]
+tank.ports_H_flow[2]
+tank.use_HeatTransfer
+tank.heatTransfer.n
+tank.heatTransfer.surfaceAreas[1]
+tank.heatTransfer.use_k
+tank.heatTransfer.k
+tank.heatTransfer.T_ambient
+tank.heatTransfer.heatPorts[1].Q_flow
+tank.heatPort.Q_flow
+tank.portInDensities[1]
+tank.portInDensities[2]
+tank.portVelocities[1]
+tank.portVelocities[2]
+tank.ports_E_flow[1]
+tank.ports_E_flow[2]
+tank.s[1]
+tank.s[2]
+tank.ports_penetration[1]
+tank.ports_penetration[2]
+tank.der(ports_penetration[1])
+tank.der(ports_penetration[2])
+tank.portAreas[1]
+tank.portAreas[2]
+tank.vessel_ps_static[1]
+tank.vessel_ps_static[2]
+tank.der(vessel_ps_static[1])
+tank.der(vessel_ps_static[2])
+tank.Re_turbulent
+tank.fluidLevel_max
+tank.vesselArea
+tank.regularFlow[1]
+tank.regularFlow[2]
+tank.inFlow[1]
+tank.inFlow[2]
+tank.level_start_eps
+pump.allowFlowReversal
+pump.port_a.h_outflow
+pump.port_a.der(h_outflow)
+pump.port_a_exposesState
+pump.port_b_exposesState
+pump.showDesignFlowDirection
+pump.p_a_start
+pump.p_b_start
+pump.m_flow_start
+pump.V_flow_single_init
+pump.delta_head_init
+pump.nParallel
+pump.N_nominal
+pump.rho_nominal
+pump.use_powerCharacteristic
+pump.checkValve
+pump.V
+pump.fluidVolume
+pump.energyDynamics
+pump.massDynamics
+pump.substanceDynamics
+pump.traceDynamics
+pump.p_start
+pump.use_T_start
+pump.T_start
+pump.h_start
+pump.X_start[1]
+pump.medium.der(p)
+pump.medium.d
+pump.medium.T
+pump.medium.der(T)
+pump.medium.X[1]
+pump.medium.u
+pump.medium.R
+pump.medium.MM
+pump.medium.preferredMediumStates
+pump.medium.standardOrderComponents
+pump.medium.T_degC
+pump.medium.p_bar
+pump.U
+pump.m
+pump.mb_flow
+pump.Hb_flow
+pump.der(Hb_flow)
+pump.Qb_flow
+pump.initialize_p
+pump.use_HeatTransfer
+pump.heatTransfer.n
+pump.heatTransfer.surfaceAreas[1]
+pump.heatTransfer.Q_flows[1]
+pump.heatTransfer.use_k
+pump.heatTransfer.k
+pump.heatTransfer.T_ambient
+pump.heatTransfer.heatPorts[1].Q_flow
+pump.g
+pump.rho
+pump.dp_pump
+pump.head
+pump.m_flow_single
+pump.V_flow
+pump.der(V_flow)
+pump.V_flow_single
+pump.der(V_flow_single)
+pump.N
+pump.W_single
+pump.der(W_single)
+pump.eta
+pump.unit_m_flow
+pump.s
+pump.show_NPSHa
+pump.monitoring.state_in.T
+pump.unitHead
+pump.unitMassFlowRate
+pump.p_a_nominal
+pump.p_b_nominal
+pump.m_flow_nominal
+pump.control_m_flow
+pump.use_m_flow_set
+pump.use_p_set
+pump.V_flow_op
+pump.head_op
+valve.allowFlowReversal
+valve.port_a.h_outflow
+valve.port_b.p
+valve.port_b.der(p)
+valve.port_b.h_outflow
+valve.port_a_exposesState
+valve.port_b_exposesState
+valve.showDesignFlowDirection
+valve.dp_start
+valve.m_flow_start
+valve.m_flow_small
+valve.show_T
+valve.show_V_flow
+valve.dp
+valve.der(dp)
+valve.V_flow
+valve.port_a_T
+valve.port_b_T
+valve.state_a.T
+valve.state_b.T
+valve.CvData
+valve.Av
+valve.Kv
+valve.Cv
+valve.dp_nominal
+valve.m_flow_nominal
+valve.rho_nominal
+valve.opening_nominal
+valve.filteredOpening
+valve.riseTime
+valve.leakageOpening
+valve.checkValve
+valve.dp_small
+valve.Kv2Av
+valve.Cv2Av
+valve.opening
+valve.filter.analogFilter
+valve.filter.filterType
+valve.filter.order
+valve.filter.f_cut
+valve.filter.gain
+valve.filter.A_ripple
+valve.filter.f_min
+valve.filter.normalized
+valve.filter.init
+valve.filter.nx
+valve.filter.x_start[1]
+valve.filter.x_start[2]
+valve.filter.y_start
+valve.filter.u_nominal
+valve.filter.x[1]
+valve.filter.der(x[1])
+valve.filter.x[2]
+valve.filter.der(x[2])
+valve.filter.ncr
+valve.filter.nc0
+valve.filter.na
+valve.filter.nr
+valve.filter.cr[1]
+valve.filter.cr[2]
+valve.filter.r[1]
+valve.filter.r[2]
+valve.filter.uu[1]
+valve.opening_actual
+valve.der(opening_actual)
+valve.minLimiter.uMin
+valve.minLimiter.y
+valve.Re_turbulent
+valve.use_Re
+m_flow
+der(m_flow)
+sensor_m_flow.allowFlowReversal
+sensor_m_flow.port_a.h_outflow
+sensor_m_flow.port_a_exposesState
+sensor_m_flow.port_b_exposesState
+sensor_m_flow.showDesignFlowDirection
+sensor_m_flow.m_flow_nominal
+sensor_m_flow.m_flow_small
+T_ambient.T
+T_ambient.port.Q_flow
+wall.dT
+wall.G
+burner.Q_flow
+burner.T_ref
+burner.alpha
+burner.port.Q_flow
+heater.allowFlowReversal
+heater.port_a_exposesState
+heater.port_b_exposesState
+heater.showDesignFlowDirection
+heater.nParallel
+heater.length
+heater.isCircular
+heater.diameter
+heater.crossArea
+heater.perimeter
+heater.roughness
+heater.V
+heater.height_ab
+heater.n
+heater.fluidVolumes[1]
+heater.energyDynamics
+heater.massDynamics
+heater.substanceDynamics
+heater.traceDynamics
+heater.p_a_start
+heater.p_b_start
+heater.ps_start[1]
+heater.use_T_start
+heater.T_start
+heater.h_start
+heater.X_start[1]
+heater.Us[1]
+heater.der(Us[1])
+heater.ms[1]
+heater.der(ms[1])
+heater.mb_flows[1]
+heater.Hb_flows[1]
+heater.Wb_flows[1]
+heater.initialize_p
+heater.lengths[1]
+heater.crossAreas[1]
+heater.dimensions[1]
+heater.roughnesses[1]
+heater.dheights[1]
+heater.momentumDynamics
+heater.m_flow_start
+heater.nNodes
+heater.modelStructure
+heater.useLumpedPressure
+heater.nFM
+heater.nFMDistributed
+heater.nFMLumped
+heater.iLumped
+heater.useInnerPortProperties
+heater.state_a.T
+heater.state_b.T
+heater.flowModel.from_dp
+heater.flowModel.n
+heater.flowModel.nParallel
+heater.flowModel.dheights[1]
+heater.flowModel.dheights[2]
+heater.flowModel.g
+heater.flowModel.allowFlowReversal
+heater.flowModel.momentumDynamics
+heater.flowModel.m_flow_start
+heater.flowModel.p_a_start
+heater.flowModel.p_b_start
+heater.flowModel.m
+heater.flowModel.Is[1]
+heater.flowModel.Is[2]
+heater.flowModel.Ib_flows[1]
+heater.flowModel.Ib_flows[2]
+heater.flowModel.Fs_p[1]
+heater.flowModel.Fs_p[2]
+heater.flowModel.der(Fs_p[1])
+heater.flowModel.der(Fs_p[2])
+heater.flowModel.useUpstreamScheme
+heater.flowModel.use_Ib_flows
+heater.flowModel.rhos[1]
+heater.flowModel.rhos[2]
+heater.flowModel.rhos[3]
+heater.flowModel.rhos_act[1]
+heater.flowModel.rhos_act[2]
+heater.flowModel.mus[1]
+heater.flowModel.mus[2]
+heater.flowModel.mus[3]
+heater.flowModel.mus_act[1]
+heater.flowModel.mus_act[2]
+heater.flowModel.dps_fg[1]
+heater.flowModel.dps_fg[2]
+heater.flowModel.der(dps_fg[1])
+heater.flowModel.der(dps_fg[2])
+heater.flowModel.Re_turbulent
+heater.flowModel.show_Res
+heater.flowModel.use_rho_nominal
+heater.flowModel.rho_nominal
+heater.flowModel.use_mu_nominal
+heater.flowModel.mu_nominal
+heater.flowModel.Res_turbulent_internal[1]
+heater.flowModel.Res_turbulent_internal[2]
+heater.flowModel.dp_nominal
+heater.flowModel.m_flow_nominal
+heater.flowModel.m_flow_small
+heater.flowModel.dp_small
+heater.flowModel.constantPressureLossCoefficient
+heater.flowModel.continuousFlowReversal
+heater.flowModel.dp_fric_nominal
+heater.H_flows[1]
+heater.H_flows[2]
+heater.vs[1]
+heater.pathLengths[1]
+heater.pathLengths[2]
+heater.dheightsFM[1]
+heater.dheightsFM[2]
+heater.vsFM[1]
+heater.vsFM[3]
+heater.use_HeatTransfer
+heater.heatTransfer.n
+heater.heatTransfer.surfaceAreas[1]
+heater.heatTransfer.use_k
+heater.heatTransfer.k
+heater.heatTransfer.T_ambient
+heater.heatTransfer.nParallel
+heater.dxs[1]
+radiator.allowFlowReversal
+radiator.port_a_exposesState
+radiator.port_b_exposesState
+radiator.showDesignFlowDirection
+radiator.nParallel
+radiator.length
+radiator.isCircular
+radiator.diameter
+radiator.crossArea
+radiator.perimeter
+radiator.roughness
+radiator.V
+radiator.height_ab
+radiator.n
+radiator.fluidVolumes[1]
+radiator.energyDynamics
+radiator.massDynamics
+radiator.substanceDynamics
+radiator.traceDynamics
+radiator.p_a_start
+radiator.p_b_start
+radiator.ps_start[1]
+radiator.use_T_start
+radiator.T_start
+radiator.h_start
+radiator.X_start[1]
+radiator.Us[1]
+radiator.der(Us[1])
+radiator.ms[1]
+radiator.der(ms[1])
+radiator.mb_flows[1]
+radiator.Hb_flows[1]
+radiator.Wb_flows[1]
+radiator.initialize_p
+radiator.lengths[1]
+radiator.crossAreas[1]
+radiator.dimensions[1]
+radiator.roughnesses[1]
+radiator.dheights[1]
+radiator.momentumDynamics
+radiator.m_flow_start
+radiator.nNodes
+radiator.modelStructure
+radiator.useLumpedPressure
+radiator.nFM
+radiator.nFMDistributed
+radiator.nFMLumped
+radiator.iLumped
+radiator.useInnerPortProperties
+radiator.state_a.T
+radiator.state_b.T
+radiator.flowModel.from_dp
+radiator.flowModel.n
+radiator.flowModel.nParallel
+radiator.flowModel.dheights[1]
+radiator.flowModel.dheights[2]
+radiator.flowModel.g
+radiator.flowModel.allowFlowReversal
+radiator.flowModel.momentumDynamics
+radiator.flowModel.m_flow_start
+radiator.flowModel.p_a_start
+radiator.flowModel.p_b_start
+radiator.flowModel.m
+radiator.flowModel.Is[1]
+radiator.flowModel.Is[2]
+radiator.flowModel.Ib_flows[1]
+radiator.flowModel.Ib_flows[2]
+radiator.flowModel.Fs_p[1]
+radiator.flowModel.Fs_p[2]
+radiator.flowModel.der(Fs_p[1])
+radiator.flowModel.der(Fs_p[2])
+radiator.flowModel.useUpstreamScheme
+radiator.flowModel.use_Ib_flows
+radiator.flowModel.rhos[1]
+radiator.flowModel.rhos[2]
+radiator.flowModel.rhos[3]
+radiator.flowModel.rhos_act[1]
+radiator.flowModel.rhos_act[2]
+radiator.flowModel.mus[1]
+radiator.flowModel.mus[2]
+radiator.flowModel.mus[3]
+radiator.flowModel.mus_act[1]
+radiator.flowModel.mus_act[2]
+radiator.flowModel.dps_fg[1]
+radiator.flowModel.dps_fg[2]
+radiator.flowModel.der(dps_fg[1])
+radiator.flowModel.der(dps_fg[2])
+radiator.flowModel.Re_turbulent
+radiator.flowModel.show_Res
+radiator.flowModel.use_rho_nominal
+radiator.flowModel.rho_nominal
+radiator.flowModel.use_mu_nominal
+radiator.flowModel.mu_nominal
+radiator.flowModel.Res_turbulent_internal[1]
+radiator.flowModel.Res_turbulent_internal[2]
+radiator.flowModel.dp_nominal
+radiator.flowModel.m_flow_nominal
+radiator.flowModel.m_flow_small
+radiator.flowModel.dp_small
+radiator.flowModel.constantPressureLossCoefficient
+radiator.flowModel.continuousFlowReversal
+radiator.flowModel.dp_fric_nominal
+radiator.H_flows[1]
+radiator.H_flows[2]
+radiator.vs[1]
+radiator.pathLengths[1]
+radiator.pathLengths[2]
+radiator.dheightsFM[1]
+radiator.dheightsFM[2]
+radiator.vsFM[1]
+radiator.vsFM[3]
+radiator.use_HeatTransfer
+radiator.heatTransfer.n
+radiator.heatTransfer.surfaceAreas[1]
+radiator.heatTransfer.use_k
+radiator.heatTransfer.k
+radiator.heatTransfer.T_ambient
+radiator.heatTransfer.nParallel
+radiator.dxs[1]
+T_forward
+T_return
+sensor_T_forward.port.m_flow
+sensor_T_forward.port.h_outflow
+_GlobalScope.Modelica.Media.Interfaces.PartialPureSubstance.X_default[1]
+sensor_T_return.port.m_flow
+sensor_T_return.port.h_outflow
+tankLevel
+der(tankLevel)
+handle.height
+handle.offset
+handle.startTime
+pipe.allowFlowReversal
+pipe.port_a.h_outflow
+pipe.port_a_exposesState
+pipe.port_b_exposesState
+pipe.showDesignFlowDirection
+pipe.nParallel
+pipe.length
+pipe.isCircular
+pipe.diameter
+pipe.crossArea
+pipe.perimeter
+pipe.roughness
+pipe.V
+pipe.height_ab
+pipe.n
+pipe.fluidVolumes[1]
+pipe.fluidVolumes[2]
+pipe.energyDynamics
+pipe.massDynamics
+pipe.substanceDynamics
+pipe.traceDynamics
+pipe.p_a_start
+pipe.p_b_start
+pipe.ps_start[1]
+pipe.ps_start[2]
+pipe.use_T_start
+pipe.T_start
+pipe.h_start
+pipe.X_start[1]
+pipe.Us[1]
+pipe.Us[2]
+pipe.der(Us[1])
+pipe.der(Us[2])
+pipe.ms[1]
+pipe.ms[2]
+pipe.der(ms[1])
+pipe.der(ms[2])
+pipe.mb_flows[1]
+pipe.mb_flows[2]
+pipe.Hb_flows[1]
+pipe.Hb_flows[2]
+pipe.Qb_flows[1]
+pipe.Qb_flows[2]
+pipe.Wb_flows[1]
+pipe.Wb_flows[2]
+pipe.initialize_p
+pipe.lengths[1]
+pipe.lengths[2]
+pipe.crossAreas[1]
+pipe.crossAreas[2]
+pipe.dimensions[1]
+pipe.dimensions[2]
+pipe.roughnesses[1]
+pipe.roughnesses[2]
+pipe.dheights[1]
+pipe.dheights[2]
+pipe.momentumDynamics
+pipe.m_flow_start
+pipe.nNodes
+pipe.modelStructure
+pipe.useLumpedPressure
+pipe.nFM
+pipe.nFMDistributed
+pipe.nFMLumped
+pipe.iLumped
+pipe.useInnerPortProperties
+pipe.state_a.T
+pipe.state_b.T
+pipe.flowModel.from_dp
+pipe.flowModel.n
+pipe.flowModel.nParallel
+pipe.flowModel.dheights[1]
+pipe.flowModel.g
+pipe.flowModel.allowFlowReversal
+pipe.flowModel.momentumDynamics
+pipe.flowModel.m_flow_start
+pipe.flowModel.p_a_start
+pipe.flowModel.p_b_start
+pipe.flowModel.m
+pipe.flowModel.pathLengths[1]
+pipe.flowModel.Is[1]
+pipe.flowModel.Ib_flows[1]
+pipe.flowModel.Fs_p[1]
+pipe.flowModel.der(Fs_p[1])
+pipe.flowModel.useUpstreamScheme
+pipe.flowModel.use_Ib_flows
+pipe.flowModel.rhos[1]
+pipe.flowModel.rhos[2]
+pipe.flowModel.rhos_act[1]
+pipe.flowModel.mus[1]
+pipe.flowModel.mus[2]
+pipe.flowModel.mus_act[1]
+pipe.flowModel.dps_fg[1]
+pipe.flowModel.der(dps_fg[1])
+pipe.flowModel.Re_turbulent
+pipe.flowModel.show_Res
+pipe.flowModel.use_rho_nominal
+pipe.flowModel.rho_nominal
+pipe.flowModel.use_mu_nominal
+pipe.flowModel.mu_nominal
+pipe.flowModel.pathLengths_internal[1]
+pipe.flowModel.Res_turbulent_internal[1]
+pipe.flowModel.dp_nominal
+pipe.flowModel.m_flow_nominal
+pipe.flowModel.m_flow_small
+pipe.flowModel.dp_small
+pipe.flowModel.constantPressureLossCoefficient
+pipe.flowModel.continuousFlowReversal
+pipe.flowModel.diameters[1]
+pipe.flowModel.dp_fric_nominal
+pipe.H_flows[1]
+pipe.H_flows[2]
+pipe.H_flows[3]
+pipe.vs[1]
+pipe.vs[2]
+pipe.pathLengths[1]
+pipe.dheightsFM[1]
+pipe.use_HeatTransfer
+pipe.heatTransfer.n
+pipe.heatTransfer.surfaceAreas[1]
+pipe.heatTransfer.surfaceAreas[2]
+pipe.heatTransfer.Q_flows[1]
+pipe.heatTransfer.Q_flows[2]
+pipe.heatTransfer.use_k
+pipe.heatTransfer.k
+pipe.heatTransfer.T_ambient
+pipe.heatTransfer.heatPorts[1].Q_flow
+pipe.heatTransfer.heatPorts[2].Q_flow
+pipe.heatTransfer.nParallel
+pipe.heatTransfer.lengths[1]
+pipe.heatTransfer.lengths[2]
+pipe.dxs[1]
+pipe.dxs[2]
+heater.mediums[1].p
+heater.mediums[1].der(p)
+heater.mediums[1].d
+heater.mediums[1].T
+heater.mediums[1].der(T)
+heater.mediums[1].X[1]
+heater.mediums[1].u
+heater.mediums[1].der(u)
+heater.mediums[1].R
+heater.mediums[1].MM
+heater.mediums[1].preferredMediumStates
+heater.mediums[1].standardOrderComponents
+heater.mediums[1].T_degC
+heater.mediums[1].p_bar
+radiator.mediums[1].p
+radiator.mediums[1].der(p)
+radiator.mediums[1].d
+radiator.mediums[1].T
+radiator.mediums[1].der(T)
+radiator.mediums[1].X[1]
+radiator.mediums[1].u
+radiator.mediums[1].der(u)
+radiator.mediums[1].R
+radiator.mediums[1].MM
+radiator.mediums[1].preferredMediumStates
+radiator.mediums[1].standardOrderComponents
+radiator.mediums[1].T_degC
+radiator.mediums[1].p_bar
+pipe.mediums[1].p
+pipe.mediums[1].der(p)
+pipe.mediums[1].d
+pipe.mediums[1].T
+pipe.mediums[1].der(T)
+pipe.mediums[1].X[1]
+pipe.mediums[1].u
+pipe.mediums[1].der(u)
+pipe.mediums[1].R
+pipe.mediums[1].MM
+pipe.mediums[1].preferredMediumStates
+pipe.mediums[1].standardOrderComponents
+pipe.mediums[1].T_degC
+pipe.mediums[1].p_bar
+pipe.mediums[2].p
+pipe.mediums[2].der(p)
+pipe.mediums[2].d
+pipe.mediums[2].T
+pipe.mediums[2].der(T)
+pipe.mediums[2].X[1]
+pipe.mediums[2].u
+pipe.mediums[2].der(u)
+pipe.mediums[2].R
+pipe.mediums[2].MM
+pipe.mediums[2].preferredMediumStates
+pipe.mediums[2].standardOrderComponents
+pipe.mediums[2].T_degC
+pipe.mediums[2].p_bar
+CPUtime
+EventCounter
+stateSelect.set1.x[1]
+stateSelect.set1.der(x[1])
+stateSelect.set1.x[2]
+stateSelect.set1.der(x[2])
+stateSelect.set1.x[3]
+stateSelect.set1.der(x[3])
+stateSelect.set1.P[1, 1]
+stateSelect.set1.P[1, 2]
+stateSelect.set1.P[1, 3]
+stateSelect.set1.P[1, 4]
+stateSelect.set1.P[1, 5]
+stateSelect.set1.P[1, 6]
+stateSelect.set1.P[1, 7]
+stateSelect.set1.P[1, 8]
+stateSelect.set1.P[1, 9]
+stateSelect.set1.P[1, 10]
+stateSelect.set1.P[1, 11]
+stateSelect.set1.P[1, 12]
+stateSelect.set1.P[1, 13]
+stateSelect.set1.P[2, 1]
+stateSelect.set1.P[2, 2]
+stateSelect.set1.P[2, 3]
+stateSelect.set1.P[2, 4]
+stateSelect.set1.P[2, 5]
+stateSelect.set1.P[2, 6]
+stateSelect.set1.P[2, 7]
+stateSelect.set1.P[2, 8]
+stateSelect.set1.P[2, 9]
+stateSelect.set1.P[2, 10]
+stateSelect.set1.P[2, 11]
+stateSelect.set1.P[2, 12]
+stateSelect.set1.P[2, 13]
+stateSelect.set1.P[3, 1]
+stateSelect.set1.P[3, 2]
+stateSelect.set1.P[3, 3]
+stateSelect.set1.P[3, 4]
+stateSelect.set1.P[3, 5]
+stateSelect.set1.P[3, 6]
+stateSelect.set1.P[3, 7]
+stateSelect.set1.P[3, 8]
+stateSelect.set1.P[3, 9]
+stateSelect.set1.P[3, 10]
+stateSelect.set1.P[3, 11]
+stateSelect.set1.P[3, 12]
+stateSelect.set1.P[3, 13]
+
+double initialValue(764,6)
+ -1  1.0132500000000000E+05       0                 1.0000000000000000E+100
+  1   280   # system.p_ambient
+ -1  2.9314999999999998E+02       0                 1.0000000000000000E+100
+  1   280   # system.T_ambient
+ -1  9.8066499999999994E+00       0                       0                
+  1   280   # system.g
+ -2       1                       0                       0                
+  6   257   # system.allowFlowReversal
+ -2       3                       1                       4                
+  6   258   # system.energyDynamics
+ -2       3                       1                       4                
+  6   258   # system.massDynamics
+ -2       3                       1                       4                
+  6   258   # system.substanceDynamics
+ -2       3                       1                       4                
+  6   258   # system.traceDynamics
+ -2       4                       1                       4                
+  6   258   # system.momentumDynamics
+ -2       0                       0                       0                
+  6   256   # system.m_flow_start
+ -2  1.0132500000000000E+05       0                 1.0000000000000000E+100
+  6   256   # system.p_start
+ -2  2.9314999999999998E+02       0                 1.0000000000000000E+100
+  6   256   # system.T_start
+ -2       0                       0                       0                
+  6   257   # system.use_eps_Re
+ -2  1.0000000000000000E-02       0                       0                
+  6   256   # system.m_flow_nominal
+ -1  1.0000000000000000E-04       0                 1.0000000000000000E+100
+  1   280   # system.eps_m_flow
+ -1       1                       0                 1.0000000000000000E+100
+  1   280   # system.dp_small
+ -1  1.0000000000000000E-04       0                 1.0000000000000000E+100
+  1   280   # system.m_flow_small
+ -2  1.0000000778628892E+00       0                 1.0000000000000000E+100
+  6   256   # tank.level
+ -2  1.0000000778628892E-02       0                       0                
+  6   256   # tank.V
+ -2       0                       0                       0                
+  6   256   # tank.der(V)
+ -1       2                       0                 1.0000000000000000E+100
+  1   280   # tank.height
+ -1  1.0000000000000000E-02       0                       0                
+  1   280   # tank.crossArea
+ -2  1.0132500000000000E+05       0                  1.0000000000000000E+08
+  6   256   # tank.p_ambient
+ -2  2.9314999999999998E+02       1                   10000                
+  6   256   # tank.T_ambient
+ -1       1                       0                 1.0000000000000000E+100
+  1   280   # tank.level_start
+ -2       3                       1                       4                
+  6   258   # tank.energyDynamics
+ -2       2                       1                       4                
+  6   258   # tank.massDynamics
+ -2       2                       1                       4                
+  6   258   # tank.substanceDynamics
+ -2       2                       1                       4                
+  6   258   # tank.traceDynamics
+ -2  1.0132500000000000E+05       0                  1.0000000000000000E+08
+  6   256   # tank.p_start
+ -2       1                       0                       0                
+  6   257   # tank.use_T_start
+ -1  2.9314999999999998E+02       1                   10000                
+  1   280   # tank.T_start
+ -2   83680                 -1.0000000000000000E+10  1.0000000000000000E+10
+  6   256   # tank.h_start
+ -1       1                       0                       1                
+  1   280   # tank.X_start[1]
+ -2  1.0132500000000000E+05       0                 1.0000000000000000E+100
+  6   256   # tank.medium.p
+ -2  9.9558600000000001E+02       0                  100000                
+  6   256   # tank.medium.d
+ -2  3.1228533206033194E+02       1                   10000                
+  6   256   # tank.medium.T
+ -2  9.9411574213956414E-05       0                       0                
+  6   256   # tank.medium.der(T)
+ -2       1                       0                       1                
+  6   256   # tank.medium.X[1]
+ -2  1.6374222934042892E+05 -1.0000000000000000E+08  1.0000000000000000E+08
+  6   256   # tank.medium.u
+ -2  4.1593802651119366E-01       0                       0                
+  6   256   # tank.medium.der(u)
+ -2       0                       0                  1.0000000000000000E+07
+  6   256   # tank.medium.R
+ -2  1.8015268000000001E-02  1.0000000000000000E-03  2.5000000000000000E-01
+  6   256   # tank.medium.MM
+ -2       1                       0                       0                
+  6   257   # tank.medium.preferredMediumStates
+ -2       1                       0                       0                
+  6   257   # tank.medium.standardOrderComponents
+ -2  3.9135332060331962E+01       0                       0                
+  6   256   # tank.medium.T_degC
+ -2  1.0132500000000000E+00       0                       0                
+  6   256   # tank.medium.p_bar
+ -2  1.6301948383328738E+06       0                       0                
+  6   256   # tank.U
+ -2  4.1410210830535732E+00       0                       0                
+  6   256   # tank.der(U)
+ -2  9.9558607751920238E+00       0                 1.0000000000000000E+100
+  6   256   # tank.m
+ -2       0                       0                       0                
+  6   256   # tank.der(m)
+ -2       0                       0                       0                
+  6   256   # tank.mb_flow
+ -2  7.3887545568141377E+01       0                       0                
+  6   256   # tank.Hb_flow
+ -2 -6.9746524485087804E+01       0                       0                
+  6   256   # tank.Qb_flow
+ -2       0                       0                       0                
+  6   256   # tank.Wb_flow
+ -2       0                       0                       0                
+  6  1281   # tank.initialize_p
+ -2       2                       0                       0                
+  6   258   # tank.nPorts
+ -2  1.1108894188269509E+05       0                  1.0000000000000000E+08
+  6   292   # tank.ports[1].p
+ -2 -3.1033862766188471E-13       0                       0                
+  6   260   # tank.ports[1].der(p)
+ -2  1.6374222934042892E+05 -1.0000000000000000E+10  1.0000000000000000E+10
+  6   260   # tank.ports[1].h_outflow
+ -2  4.1593802651119366E-01       0                       0                
+  6   260   # tank.ports[1].der(h_outflow)
+ -2  1.1106673561727846E+05       0                  1.0000000000000000E+08
+  6   260   # tank.ports[2].p
+ -2  1.1619301532784150E-11       0                       0                
+  6   260   # tank.ports[2].der(p)
+ -2       1                       0                       0                
+  6   257   # tank.use_portsData
+ -1  1.0000000000000000E-02       0                 1.0000000000000000E+100
+  1   280   # tank.portsData[1].diameter
+ -1       0                       0                 1.0000000000000000E+100
+  1   280   # tank.portsData[1].height
+ -1  5.0000000000000000E-01       0                 1.0000000000000000E+100
+  1   280   # tank.portsData[1].zeta_out
+ -1  1.0400000000000000E+00       0                 1.0000000000000000E+100
+  1   280   # tank.portsData[1].zeta_in
+ -1  1.0000000000000000E-02       0                 1.0000000000000000E+100
+  1   280   # tank.portsData[2].diameter
+ -1       0                       0                 1.0000000000000000E+100
+  1   280   # tank.portsData[2].height
+ -1  5.0000000000000000E-01       0                 1.0000000000000000E+100
+  1   280   # tank.portsData[2].zeta_out
+ -1  1.0400000000000000E+00       0                 1.0000000000000000E+100
+  1   280   # tank.portsData[2].zeta_in
+ -2  1.0000000000000000E-02 -100000                  100000                
+  6   256   # tank.m_flow_nominal
+ -2  1.0000000000000000E-04       0                 1.0000000000000000E+100
+  6   256   # tank.m_flow_small
+ -2       0                       0                       0                
+  6   257   # tank.use_Re
+ -2  2.2530136906929706E+03 -1.0000000000000000E+08  1.0000000000000000E+08
+  6   256   # tank.ports_H_flow[1]
+ -2 -2.1791261451248292E+03 -1.0000000000000000E+08  1.0000000000000000E+08
+  6   256   # tank.ports_H_flow[2]
+ -2       1                       0                       0                
+  6   257   # tank.use_HeatTransfer
+ -2       1                       0                       0                
+  6   258   # tank.heatTransfer.n
+ -2  3.6449079778277876E-01       0                       0                
+  6   256   # tank.heatTransfer.surfaceAreas[1]
+ -2       1                       0                       0                
+  6   257   # tank.heatTransfer.use_k
+ -2      10                       0                       0                
+  6   256   # tank.heatTransfer.k
+ -2  2.9314999999999998E+02       0                 1.0000000000000000E+100
+  6   256   # tank.heatTransfer.T_ambient
+ -2       0                       0                       0                
+  6   388   # tank.heatTransfer.heatPorts[1].Q_flow
+ -2       0                       0                       0                
+  6   388   # tank.heatPort.Q_flow
+ -2  9.9558600000000001E+02       0                  100000                
+  6   256   # tank.portInDensities[1]
+ -2  9.9558600000000001E+02       0                  100000                
+  6   256   # tank.portInDensities[2]
+ -2  1.7019743479319821E-01       0                       0                
+  6   256   # tank.portVelocities[1]
+ -2 -1.7019743479319821E-01       0                       0                
+  6   256   # tank.portVelocities[2]
+ -2  1.9275146918584421E-04       0                       0                
+  6   256   # tank.ports_E_flow[1]
+ -2 -1.9275146918584421E-04       0                       0                
+  6   256   # tank.ports_E_flow[2]
+ -2  1.0000000778628892E+00       0                       0                
+  6   256   # tank.s[1]
+ -2  1.0000000778628892E+00       0                       0                
+  6   256   # tank.s[2]
+ -2       1                       0                       0                
+  6   256   # tank.ports_penetration[1]
+ -2       1                       0                       0                
+  6   256   # tank.ports_penetration[2]
+ -2       0                       0                       0                
+  6   256   # tank.der(ports_penetration[1])
+ -2       0                       0                       0                
+  6   256   # tank.der(ports_penetration[2])
+ -2  7.8539816339744827E-05       0                       0                
+  6   256   # tank.portAreas[1]
+ -2  7.8539816339744827E-05       0                       0                
+  6   256   # tank.portAreas[2]
+ -2  1.1108836420710369E+05       0                  1.0000000000000000E+08
+  6   256   # tank.vessel_ps_static[1]
+ -2  1.1108836420710369E+05       0                  1.0000000000000000E+08
+  6   256   # tank.vessel_ps_static[2]
+ -2       0                       0                       0                
+  6   256   # tank.der(vessel_ps_static[1])
+ -2       0                       0                       0                
+  6   256   # tank.der(vessel_ps_static[2])
+ -2     100                       0                       0                
+  6   256   # tank.Re_turbulent
+ -2       2                       0                 1.0000000000000000E+100
+  6  1280   # tank.fluidLevel_max
+ -2  1.0000000000000000E-02       0                       0                
+  6  1280   # tank.vesselArea
+ -2       1                       0                       0                
+  6  1345   # tank.regularFlow[1]
+ -2       1                       0                       0                
+  6  1345   # tank.regularFlow[2]
+ -2       0                       0                       0                
+  6  1377   # tank.inFlow[1]
+ -2       0                       0                       0                
+  6  1377   # tank.inFlow[2]
+ -2       1                       0                 1.0000000000000000E+100
+  6  1280   # tank.level_start_eps
+ -2       0                       0                       0                
+  6   257   # pump.allowFlowReversal
+ -2  1.6376600084834325E+05 -1.0000000000000000E+10  1.0000000000000000E+10
+  6   260   # pump.port_a.h_outflow
+ -2  4.1593802651117906E-01       0                       0                
+  6   260   # pump.port_a.der(h_outflow)
+ -1       0                       0                       0                
+  1  1305   # pump.port_a_exposesState
+ -2       0                       0                       0                
+  6  1281   # pump.port_b_exposesState
+ -1       1                       0                       0                
+  1  1305   # pump.showDesignFlowDirection
+ -1  1.1000000000000000E+05       0                  1.0000000000000000E+08
+  1   280   # pump.p_a_start
+ -1  1.3000000000000000E+05       0                  1.0000000000000000E+08
+  1   280   # pump.p_b_start
+ -1  1.0000000000000000E-02 -100000                  100000                
+  1   280   # pump.m_flow_start
+ -2  1.0044335697769957E-05       0                       0                
+  6   256   # pump.V_flow_single_init
+ -2 -2.0484743919217996E+00       0                 1.0000000000000000E+100
+  6   256   # pump.delta_head_init
+ -1       1                       1                 1.0000000000000000E+100
+  1   282   # pump.nParallel
+ -1    1500                       0                       0                
+  1   280   # pump.N_nominal
+ -1  9.9558600000000001E+02       0                  100000                
+  1   280   # pump.rho_nominal
+ -2       0                       0                       0                
+  6   257   # pump.use_powerCharacteristic
+ -2       0                       0                       0                
+  6   257   # pump.checkValve
+ -2       0                       0                       0                
+  6   256   # pump.V
+ -2       0                       0                       0                
+  6   256   # pump.fluidVolume
+ -2       4                       1                       4                
+  6   258   # pump.energyDynamics
+ -2       4                       1                       4                
+  6   258   # pump.massDynamics
+ -2       4                       1                       4                
+  6   258   # pump.substanceDynamics
+ -2       4                       1                       4                
+  6   258   # pump.traceDynamics
+ -2  1.3000000000000000E+05       0                  1.0000000000000000E+08
+  6   256   # pump.p_start
+ -2       1                       0                       0                
+  6   257   # pump.use_T_start
+ -1  3.1314999999999998E+02       1                   10000                
+  1   280   # pump.T_start
+ -2  1.6736000000000000E+05 -1.0000000000000000E+10  1.0000000000000000E+10
+  6   256   # pump.h_start
+ -1       1                       0                       1                
+  1   280   # pump.X_start[1]
+ -2       0                       0                       0                
+  6   256   # pump.medium.der(p)
+ -2  9.9558600000000001E+02       0                  100000                
+  6   256   # pump.medium.d
+ -2  3.1229101358708010E+02       1                   10000                
+  6   256   # pump.medium.T
+ -2  9.9411574213952931E-05       0                       0                
+  6   256   # pump.medium.der(T)
+ -2       1                       0                       1                
+  6   256   # pump.medium.X[1]
+ -2  1.6376600084834325E+05 -1.0000000000000000E+08  1.0000000000000000E+08
+  6   256   # pump.medium.u
+ -2       0                       0                  1.0000000000000000E+07
+  6   256   # pump.medium.R
+ -2  1.8015268000000001E-02  1.0000000000000000E-03  2.5000000000000000E-01
+  6   256   # pump.medium.MM
+ -2       1                       0                       0                
+  6   257   # pump.medium.preferredMediumStates
+ -2       1                       0                       0                
+  6   257   # pump.medium.standardOrderComponents
+ -2  3.9141013587080124E+01       0                       0                
+  6   256   # pump.medium.T_degC
+ -2  1.3000000000000000E+00       0                       0                
+  6   256   # pump.medium.p_bar
+ -2       0                       0                       0                
+  6   256   # pump.U
+ -2       0                       0                 1.0000000000000000E+100
+  6   256   # pump.m
+ -2       0                       0                       0                
+  6   256   # pump.mb_flow
+ -2 -3.1635769595803920E-01       0                       0                
+  6   256   # pump.Hb_flow
+ -2  8.5170919286667090E-14       0                       0                
+  6   256   # pump.der(Hb_flow)
+ -2       0                       0                       0                
+  6   256   # pump.Qb_flow
+ -1       0                       0                       0                
+  1  1305   # pump.initialize_p
+ -2       0                       0                       0                
+  6   257   # pump.use_HeatTransfer
+ -2       1                       0                       0                
+  6   258   # pump.heatTransfer.n
+ -2       0                       0                       0                
+  6   256   # pump.heatTransfer.surfaceAreas[1]
+ -2       0                       0                       0                
+  6   256   # pump.heatTransfer.Q_flows[1]
+ -2       0                       0                       0                
+  6   257   # pump.heatTransfer.use_k
+ -2       0                       0                       0                
+  6   256   # pump.heatTransfer.k
+ -2  2.9314999999999998E+02       0                 1.0000000000000000E+100
+  6   256   # pump.heatTransfer.T_ambient
+ -2       0                       0                       0                
+  6   388   # pump.heatTransfer.heatPorts[1].Q_flow
+ -2  9.8066499999999994E+00       0                       0                
+  6   256   # pump.g
+ -2  9.9558600000000001E+02       0                  100000                
+  6   256   # pump.rho
+ -2  1.8933264382721536E+04       0                       0                
+  6   256   # pump.dp_pump
+ -2  1.9392153621745083E+00       0                 1.0000000000000000E+100
+  6   256   # pump.head
+ -2  1.3308272117111027E-02       0                       0                
+  6   256   # pump.m_flow_single
+ -2  1.3367275270153484E-05       0                       0                
+  6   256   # pump.V_flow
+ -2 -3.5905808767630031E-18       0                       0                
+  6   256   # pump.der(V_flow)
+ -2  1.3367275270153484E-05       0                       0                
+  6   256   # pump.V_flow_single
+ -2 -3.5905808767630031E-18       0                       0                
+  6   256   # pump.der(V_flow_single)
+ -2  1.7223082132369525E+03       0                       0                
+  6   256   # pump.N
+ -2  3.1635769595803920E-01       0                       0                
+  6   256   # pump.W_single
+ -2 -8.5170919286667090E-14       0                       0                
+  6   256   # pump.der(W_single)
+ -2  8.0000000000000004E-01       0                       0                
+  6   256   # pump.eta
+ -2       1                 -100000                  100000                
+  6   768   # pump.unit_m_flow
+ -2       0                       0                       0                
+  6   256   # pump.s
+ -2       0                       0                       0                
+  6   257   # pump.show_NPSHa
+ -2  3.1228533206033194E+02       1                   10000                
+  6   256   # pump.monitoring.state_in.T
+ -2       1                       0                 1.0000000000000000E+100
+  6  1280   # pump.unitHead
+ -2       1                       0                       0                
+  6  1280   # pump.unitMassFlowRate
+ -1  1.1000000000000000E+05       0                  1.0000000000000000E+08
+  1   280   # pump.p_a_nominal
+ -1  1.3000000000000000E+05       0                  1.0000000000000000E+08
+  1   280   # pump.p_b_nominal
+ -1  1.0000000000000000E-02 -100000                  100000                
+  1   280   # pump.m_flow_nominal
+ -2       0                       0                       0                
+  6   257   # pump.control_m_flow
+ -2       0                       0                       0                
+  6   257   # pump.use_m_flow_set
+ -2       0                       0                       0                
+  6   257   # pump.use_p_set
+ -2  1.0044335697769957E-05       0                       0                
+  6   256   # pump.V_flow_op
+ -2  2.0484743919217996E+00       0                 1.0000000000000000E+100
+  6   256   # pump.head_op
+ -2       0                       0                       0                
+  6   257   # valve.allowFlowReversal
+ -2  1.6929423075112602E+05 -1.0000000000000000E+10  1.0000000000000000E+10
+  6   260   # valve.port_a.h_outflow
+ -2  1.1163441802056905E+05       0                  1.0000000000000000E+08
+  6   292   # valve.port_b.p
+ -2 -1.5609950243156780E-10       0                       0                
+  6   260   # valve.port_b.der(p)
+ -2  2.9229990115729667E+05 -1.0000000000000000E+10  1.0000000000000000E+10
+  6   260   # valve.port_b.h_outflow
+ -2       0                       0                       0                
+  6  1281   # valve.port_a_exposesState
+ -2       0                       0                       0                
+  6  1281   # valve.port_b_exposesState
+ -1       1                       0                       0                
+  1  1305   # valve.showDesignFlowDirection
+ -1   18000                 -9.9999999999999995E+59  1.0000000000000000E+08
+  1   280   # valve.dp_start
+ -2  1.0000000000000000E-02 -100000                  100000                
+  6   256   # valve.m_flow_start
+ -2  1.0000000000000000E-04 -100000                  100000                
+  6   256   # valve.m_flow_small
+ -2       1                       0                       0                
+  6   257   # valve.show_T
+ -2       1                       0                       0                
+  6   257   # valve.show_V_flow
+ -2  1.7711010613982187E+04       0                       0                
+  6   256   # valve.dp
+ -2  3.4304649899625669E-10       0                       0                
+  6   256   # valve.der(dp)
+ -2  1.3367275270153484E-05       0                       0                
+  6   256   # valve.V_flow
+ -2  3.4301135304906705E+02       1                   10000                
+  6   256   # valve.port_a_T
+ -2  3.4301135304906705E+02       1                   10000                
+  6   256   # valve.port_b_T
+ -2  3.4301135304906705E+02       1                   10000                
+  6  1280   # valve.state_a.T
+ -2  3.1361229224453297E+02       1                   10000                
+  6  1280   # valve.state_b.T
+ -2       4                       1                       4                
+  6   258   # valve.CvData
+ -2  3.1692800046685108E-06       0                       0                
+  6   256   # valve.Av
+ -1       0                       0                       0                
+  1   280   # valve.Kv
+ -1       0                       0                       0                
+  1   280   # valve.Cv
+ -1   10000                       0                       0                
+  1   280   # valve.dp_nominal
+ -1  1.0000000000000000E-02 -100000                  100000                
+  1   280   # valve.m_flow_nominal
+ -1  9.9558600000000001E+02       0                  100000                
+  1   280   # valve.rho_nominal
+ -1       1                       0                       1                
+  1   280   # valve.opening_nominal
+ -2       1                       0                       0                
+  6   257   # valve.filteredOpening
+ -1       1                       0                       0                
+  1   280   # valve.riseTime
+ -1  1.0000000000000000E-03       0                       1                
+  1   280   # valve.leakageOpening
+ -2       0                       0                       0                
+  6   257   # valve.checkValve
+ -2       1                       0                 1.0000000000000000E+100
+  6  1280   # valve.dp_small
+ -2  2.7699999999999999E-05       0                       0                
+  6   256   # valve.Kv2Av
+ -2  2.4000000000000001E-05       0                       0                
+  6   256   # valve.Cv2Av
+ -2       1                       0                       1                
+  6   320   # valve.opening
+ -2       1                       1                       4                
+  6   258   # valve.filter.analogFilter
+ -2       1                       1                       4                
+  6   258   # valve.filter.filterType
+ -2       2                       1                 1.0000000000000000E+100
+  6   258   # valve.filter.order
+ -2  7.9577471545947676E-01       0                       0                
+  6   256   # valve.filter.f_cut
+ -1       1                       0                       0                
+  1   280   # valve.filter.gain
+ -1  5.0000000000000000E-01       0                       0                
+  1   280   # valve.filter.A_ripple
+ -1       0                       0                       0                
+  1   280   # valve.filter.f_min
+ -1       1                       0                       0                
+  1   281   # valve.filter.normalized
+ -2       2                       1                       4                
+  6   258   # valve.filter.init
+ -2       2                       0                       0                
+  6   258   # valve.filter.nx
+ -1       0                       0                       0                
+  1   280   # valve.filter.x_start[1]
+ -1       0                       0                       0                
+  1   280   # valve.filter.x_start[2]
+ -1       0                       0                       0                
+  1   280   # valve.filter.y_start
+ -1       1                       0                       0                
+  1   280   # valve.filter.u_nominal
+ -2       1                       0                       0                
+  2   272   # valve.filter.x[1]
+ -2       0                       0                       0                
+  3   256   # valve.filter.der(x[1])
+ -2  1.0000000000000357E+00       0                       0                
+  6   256   # valve.filter.x[2]
+ -2 -2.7829433518356925E-13       0                       0                
+  6   256   # valve.filter.der(x[2])
+ -2       2                       0                       0                
+  6  1282   # valve.filter.ncr
+ -2       0                       0                       0                
+  6  1282   # valve.filter.nc0
+ -2       0                       0                       0                
+  6  1282   # valve.filter.na
+ -2       2                       0                       0                
+  6  1282   # valve.filter.nr
+ -2  1.5569270363130960E+00       0                       0                
+  6  1280   # valve.filter.cr[1]
+ -2  1.5569270363130960E+00       0                       0                
+  6  1280   # valve.filter.cr[2]
+ -2 -7.7846351815654806E+00       0                       0                
+  6  1280   # valve.filter.r[1]
+ -2 -7.7846351815654806E+00       0                       0                
+  6  1280   # valve.filter.r[2]
+ -2       1                       0                       0                
+  6  1344   # valve.filter.uu[1]
+ -2  1.0000000000000357E+00       0                       0                
+  6  1280   # valve.opening_actual
+ -2 -2.7829433518356925E-13       0                       0                
+  6  1280   # valve.der(opening_actual)
+ -2  1.0000000000000000E-03       0                       0                
+  6  1280   # valve.minLimiter.uMin
+ -2       1                       0                       0                
+  6  1344   # valve.minLimiter.y
+ -2    4000                       0                       0                
+  6   256   # valve.Re_turbulent
+ -2       0                       0                       0                
+  6   257   # valve.use_Re
+ -2  1.3308272117111027E-02       0                  100000                
+  4  1280   # m_flow
+ -2 -3.5747320527729715E-15       0                       0                
+  6  1280   # der(m_flow)
+ -2       1                       0                       0                
+  6   257   # sensor_m_flow.allowFlowReversal
+ -2  2.9230160863850830E+05 -1.0000000000000000E+10  1.0000000000000000E+10
+  6   260   # sensor_m_flow.port_a.h_outflow
+ -1       0                       0                       0                
+  1  1305   # sensor_m_flow.port_a_exposesState
+ -1       0                       0                       0                
+  1  1305   # sensor_m_flow.port_b_exposesState
+ -1       1                       0                       0                
+  1  1305   # sensor_m_flow.showDesignFlowDirection
+ -2  1.0000000000000000E-02 -100000                  100000                
+  6   256   # sensor_m_flow.m_flow_nominal
+ -2  1.0000000000000000E-04       0                  100000                
+  6   256   # sensor_m_flow.m_flow_small
+ -2  2.9314999999999998E+02       0                 1.0000000000000000E+100
+  6   256   # T_ambient.T
+ -2  1.6369833795626391E+03       0                       0                
+  6   388   # T_ambient.port.Q_flow
+ -2 -2.0462292244532989E+01       0                       0                
+  6   256   # wall.dT
+ -1      80                       0                       0                
+  1   280   # wall.G
+ -1    1600                       0                       0                
+  1   280   # burner.Q_flow
+ -1  3.4314999999999998E+02       0                 1.0000000000000000E+100
+  1   280   # burner.T_ref
+ -1 -5.0000000000000000E-01       0                       0                
+  1   280   # burner.alpha
+ -2 -1.7105910825031970E+03       0                       0                
+  6   388   # burner.port.Q_flow
+ -2       1                       0                       0                
+  6   257   # heater.allowFlowReversal
+ -2       0                       0                       0                
+  6  1281   # heater.port_a_exposesState
+ -2       0                       0                       0                
+  6  1281   # heater.port_b_exposesState
+ -1       1                       0                       0                
+  1  1305   # heater.showDesignFlowDirection
+ -1       1                       1                 1.0000000000000000E+100
+  1   280   # heater.nParallel
+ -1       2                       0                       0                
+  1   280   # heater.length
+ -2       1                       0                       0                
+  6   257   # heater.isCircular
+ -1  1.0000000000000000E-02       0                 1.0000000000000000E+100
+  1   280   # heater.diameter
+ -2  7.8539816339744841E-05       0                       0                
+  6   256   # heater.crossArea
+ -2  3.1415926535897934E-02       0                       0                
+  6   256   # heater.perimeter
+ -1  2.5000000000000001E-05       0                 1.0000000000000000E+100
+  1   280   # heater.roughness
+ -2  1.5707963267948968E-04       0                       0                
+  6   256   # heater.V
+ -2       0                       0                       0                
+  6   256   # heater.height_ab
+ -2       1                       0                       0                
+  6   258   # heater.n
+ -2  1.5707963267948968E-04       0                       0                
+  6   256   # heater.fluidVolumes[1]
+ -2       3                       1                       4                
+  6   258   # heater.energyDynamics
+ -2       3                       1                       4                
+  6   258   # heater.massDynamics
+ -2       3                       1                       4                
+  6   258   # heater.substanceDynamics
+ -2       3                       1                       4                
+  6   258   # heater.traceDynamics
+ -1  1.3000000000000000E+05       0                  1.0000000000000000E+08
+  1   280   # heater.p_a_start
+ -2  1.3000000000000000E+05       0                  1.0000000000000000E+08
+  6   256   # heater.p_b_start
+ -2  1.3000000000000000E+05       0                  1.0000000000000000E+08
+  6   256   # heater.ps_start[1]
+ -2       1                       0                       0                
+  6   257   # heater.use_T_start
+ -2  3.5314999999999998E+02       1                   10000                
+  6   256   # heater.T_start
+ -2  3.3472000000000000E+05 -1.0000000000000000E+10  1.0000000000000000E+10
+  6   256   # heater.h_start
+ -1       1                       0                       1                
+  1   280   # heater.X_start[1]
+ -2  4.5711962142757533E+04       0                       0                
+  6   256   # heater.Us[1]
+ -2  4.2372934240120230E-03       0                       0                
+  6   256   # heater.der(Us[1])
+ -2  1.5638628318084241E-01       0                 1.0000000000000000E+100
+  6   256   # heater.ms[1]
+ -2       0                 -100000                  100000                
+  6   256   # heater.der(ms[1])
+ -2       0                 -100000                  100000                
+  6   256   # heater.mb_flows[1]
+ -2 -1.7105868452097729E+03       0                       0                
+  6   256   # heater.Hb_flows[1]
+ -2  1.8996040680226378E-19       0                       0                
+  6   256   # heater.Wb_flows[1]
+ -2       0                       0                       0                
+  6  1281   # heater.initialize_p
+ -2       2                       0                       0                
+  6   256   # heater.lengths[1]
+ -2  7.8539816339744841E-05       0                       0                
+  6   256   # heater.crossAreas[1]
+ -2  1.0000000000000000E-02       0                       0                
+  6   256   # heater.dimensions[1]
+ -2  2.5000000000000001E-05       0                 1.0000000000000000E+100
+  6   256   # heater.roughnesses[1]
+ -2       0                       0                       0                
+  6   256   # heater.dheights[1]
+ -2       4                       1                       4                
+  6   258   # heater.momentumDynamics
+ -2       0                 -100000                  100000                
+  6   256   # heater.m_flow_start
+ -2       1                       1                 1.0000000000000000E+100
+  6   258   # heater.nNodes
+ -2       2                       1                       4                
+  6   258   # heater.modelStructure
+ -2       0                       0                       0                
+  6   257   # heater.useLumpedPressure
+ -2       2                       0                       0                
+  6   258   # heater.nFM
+ -2       2                       0                       0                
+  6   258   # heater.nFMDistributed
+ -2       2                       0                       0                
+  6   258   # heater.nFMLumped
+ -2       1                       0                       0                
+  6   258   # heater.iLumped
+ -2       0                       0                       0                
+  6   257   # heater.useInnerPortProperties
+ -2  3.1229101358708010E+02       1                   10000                
+  6   256   # heater.state_a.T
+ -2  3.4301156201970423E+02       1                   10000                
+  6   256   # heater.state_b.T
+ -2       1                       0                       0                
+  6   257   # heater.flowModel.from_dp
+ -2       3                       0                       0                
+  6   258   # heater.flowModel.n
+ -2       1                       0                       0                
+  6   256   # heater.flowModel.nParallel
+ -2       0                       0                       0                
+  6   256   # heater.flowModel.dheights[1]
+ -2       0                       0                       0                
+  6   256   # heater.flowModel.dheights[2]
+ -2  9.8066499999999994E+00       0                       0                
+  6   256   # heater.flowModel.g
+ -2       1                       0                       0                
+  6   257   # heater.flowModel.allowFlowReversal
+ -2       4                       1                       4                
+  6   258   # heater.flowModel.momentumDynamics
+ -2       0                 -100000                  100000                
+  6   256   # heater.flowModel.m_flow_start
+ -2  1.3000000000000000E+05       0                  1.0000000000000000E+08
+  6   256   # heater.flowModel.p_a_start
+ -2  1.3000000000000000E+05       0                  1.0000000000000000E+08
+  6   256   # heater.flowModel.p_b_start
+ -2       2                       0                       0                
+  6   258   # heater.flowModel.m
+ -2  1.3308272117111027E-02       0                       0                
+  6   256   # heater.flowModel.Is[1]
+ -2  1.3308272117111027E-02       0                       0                
+  6   256   # heater.flowModel.Is[2]
+ -2       0                       0                       0                
+  6   256   # heater.flowModel.Ib_flows[1]
+ -2       0                       0                       0                
+  6   256   # heater.flowModel.Ib_flows[2]
+ -2 -4.2841595686331042E-03       0                       0                
+  6   256   # heater.flowModel.Fs_p[1]
+ -2 -4.2841595686342474E-03       0                       0                
+  6   256   # heater.flowModel.Fs_p[2]
+ -2  1.2235652312879919E-15       0                       0                
+  6   256   # heater.flowModel.der(Fs_p[1])
+ -2  1.2235652312884011E-15       0                       0                
+  6   256   # heater.flowModel.der(Fs_p[2])
+ -2       1                       0                       0                
+  6   257   # heater.flowModel.useUpstreamScheme
+ -2       0                       0                       0                
+  6   257   # heater.flowModel.use_Ib_flows
+ -2  9.9558600000000001E+02       0                  100000                
+  6   256   # heater.flowModel.rhos[1]
+ -2  9.9558600000000001E+02       0                  100000                
+  6   256   # heater.flowModel.rhos[2]
+ -2  9.9558600000000001E+02       0                  100000                
+  6   256   # heater.flowModel.rhos[3]
+ -2  9.9558600000000001E+02       0                  100000                
+  6   256   # heater.flowModel.rhos_act[1]
+ -2  9.9558600000000001E+02       0                  100000                
+  6   256   # heater.flowModel.rhos_act[2]
+ -2  1.0000000000000000E-03       0                  1.0000000000000000E+08
+  6   256   # heater.flowModel.mus[1]
+ -2  1.0000000000000000E-03       0                  1.0000000000000000E+08
+  6   256   # heater.flowModel.mus[2]
+ -2  1.0000000000000000E-03       0                  1.0000000000000000E+08
+  6   256   # heater.flowModel.mus[3]
+ -2  1.0000000000000000E-03       0                  1.0000000000000000E+08
+  6   256   # heater.flowModel.mus_act[1]
+ -2  1.0000000000000000E-03       0                  1.0000000000000000E+08
+  6   256   # heater.flowModel.mus_act[2]
+ -2  5.4547613787392045E+01       0                       0                
+  6   256   # heater.flowModel.dps_fg[1]
+ -2  5.4547613787406597E+01       0                       0                
+  6   256   # heater.flowModel.dps_fg[2]
+ -2 -1.5578916380388967E-11       0                       0                
+  6   256   # heater.flowModel.der(dps_fg[1])
+ -2 -1.5578916380394179E-11       0                       0                
+  6   256   # heater.flowModel.der(dps_fg[2])
+ -2    4000                       0                       0                
+  6   256   # heater.flowModel.Re_turbulent
+ -2       0                       0                       0                
+  6   257   # heater.flowModel.show_Res
+ -2       0                       0                       0                
+  6  1281   # heater.flowModel.use_rho_nominal
+ -1  9.9558600000000001E+02       0                 1.0000000000000000E+100
+  1  1304   # heater.flowModel.rho_nominal
+ -2       0                       0                       0                
+  6  1281   # heater.flowModel.use_mu_nominal
+ -1  1.0000000000000000E-03       0                 1.0000000000000000E+100
+  1  1304   # heater.flowModel.mu_nominal
+ -2    4000                       0                       0                
+  6   256   # heater.flowModel.Res_turbulent_internal[1]
+ -2    4000                       0                       0                
+  6   256   # heater.flowModel.Res_turbulent_internal[2]
+ -2    1000                       0                 1.0000000000000000E+100
+  6   256   # heater.flowModel.dp_nominal
+ -2  1.0000000000000000E-02       0                       0                
+  6   256   # heater.flowModel.m_flow_nominal
+ -2  1.0000000000000000E-04       0                       0                
+  6   256   # heater.flowModel.m_flow_small
+ -2       1                       0                 1.0000000000000000E+100
+  6  1280   # heater.flowModel.dp_small
+ -2       0                       0                       0                
+  6  1281   # heater.flowModel.constantPressureLossCoefficient
+ -2       0                       0                       0                
+  6  1281   # heater.flowModel.continuousFlowReversal
+ -2  8.1848610630372875E+01       0                 1.0000000000000000E+100
+  6  1280   # heater.flowModel.dp_fric_nominal
+ -2  2.1794425028207870E+03 -1.0000000000000000E+08  1.0000000000000000E+08
+  6   256   # heater.H_flows[1]
+ -2  3.8900293480305600E+03 -1.0000000000000000E+08  1.0000000000000000E+08
+  6   256   # heater.H_flows[2]
+ -2  1.7019743479319818E-01       0                       0                
+  6   256   # heater.vs[1]
+ -2       1                       0                       0                
+  6  1280   # heater.pathLengths[1]
+ -2       1                       0                       0                
+  6  1280   # heater.pathLengths[2]
+ -2       0                       0                       0                
+  6  1280   # heater.dheightsFM[1]
+ -2       0                       0                       0                
+  6  1280   # heater.dheightsFM[2]
+ -2  1.7019743479319818E-01       0                       0                
+  6  1280   # heater.vsFM[1]
+ -2  1.7019743479319818E-01       0                       0                
+  6  1280   # heater.vsFM[3]
+ -2       1                       0                       0                
+  6   257   # heater.use_HeatTransfer
+ -2       1                       0                       0                
+  6   258   # heater.heatTransfer.n
+ -2  6.2831853071795868E-02       0                       0                
+  6   256   # heater.heatTransfer.surfaceAreas[1]
+ -2       1                       0                       0                
+  6   257   # heater.heatTransfer.use_k
+ -2       0                       0                       0                
+  6   256   # heater.heatTransfer.k
+ -2  2.9314999999999998E+02       0                 1.0000000000000000E+100
+  6   256   # heater.heatTransfer.T_ambient
+ -2       1                       0                       0                
+  6   256   # heater.heatTransfer.nParallel
+ -2       1                       0                       0                
+  6   256   # heater.dxs[1]
+ -2       1                       0                       0                
+  6   257   # radiator.allowFlowReversal
+ -2       0                       0                       0                
+  6  1281   # radiator.port_a_exposesState
+ -2       0                       0                       0                
+  6  1281   # radiator.port_b_exposesState
+ -1       1                       0                       0                
+  1  1305   # radiator.showDesignFlowDirection
+ -1       1                       1                 1.0000000000000000E+100
+  1   280   # radiator.nParallel
+ -1      10                       0                       0                
+  1   280   # radiator.length
+ -2       1                       0                       0                
+  6   257   # radiator.isCircular
+ -1  1.0000000000000000E-02       0                 1.0000000000000000E+100
+  1   280   # radiator.diameter
+ -2  7.8539816339744841E-05       0                       0                
+  6   256   # radiator.crossArea
+ -2  3.1415926535897934E-02       0                       0                
+  6   256   # radiator.perimeter
+ -1  2.5000000000000001E-05       0                 1.0000000000000000E+100
+  1   280   # radiator.roughness
+ -2  7.8539816339744844E-04       0                       0                
+  6   256   # radiator.V
+ -2       0                       0                       0                
+  6   256   # radiator.height_ab
+ -2       1                       0                       0                
+  6   258   # radiator.n
+ -2  7.8539816339744844E-04       0                       0                
+  6   256   # radiator.fluidVolumes[1]
+ -2       3                       1                       4                
+  6   258   # radiator.energyDynamics
+ -2       3                       1                       4                
+  6   258   # radiator.massDynamics
+ -2       3                       1                       4                
+  6   258   # radiator.substanceDynamics
+ -2       3                       1                       4                
+  6   258   # radiator.traceDynamics
+ -1  1.1000000000000000E+05       0                  1.0000000000000000E+08
+  1   280   # radiator.p_a_start
+ -2  1.1000000000000000E+05       0                  1.0000000000000000E+08
+  6   256   # radiator.p_b_start
+ -2  1.1000000000000000E+05       0                  1.0000000000000000E+08
+  6   256   # radiator.ps_start[1]
+ -2       1                       0                       0                
+  6   257   # radiator.use_T_start
+ -2  3.1314999999999998E+02       1                   10000                
+  6   256   # radiator.T_start
+ -2  1.6736000000000000E+05 -1.0000000000000000E+10  1.0000000000000000E+10
+  6   256   # radiator.h_start
+ -1       1                       0                       1                
+  1   280   # radiator.X_start[1]
+ -2  1.3237647755564237E+05       0                       0                
+  6   256   # radiator.Us[1]
+ -2  9.5541503505955916E-03       0                       0                
+  6   256   # radiator.der(Us[1])
+ -2  7.8193141590421211E-01       0                 1.0000000000000000E+100
+  6   256   # radiator.ms[1]
+ -2       0                 -100000                  100000                
+  6   256   # radiator.der(ms[1])
+ -2       0                 -100000                  100000                
+  6   256   # radiator.mb_flows[1]
+ -2  1.6369929337129897E+03       0                       0                
+  6   256   # radiator.Hb_flows[1]
+ -2  7.5984162720905512E-19       0                       0                
+  6   256   # radiator.Wb_flows[1]
+ -2       0                       0                       0                
+  6  1281   # radiator.initialize_p
+ -2      10                       0                       0                
+  6   256   # radiator.lengths[1]
+ -2  7.8539816339744841E-05       0                       0                
+  6   256   # radiator.crossAreas[1]
+ -2  1.0000000000000000E-02       0                       0                
+  6   256   # radiator.dimensions[1]
+ -2  2.5000000000000001E-05       0                 1.0000000000000000E+100
+  6   256   # radiator.roughnesses[1]
+ -2       0                       0                       0                
+  6   256   # radiator.dheights[1]
+ -2       4                       1                       4                
+  6   258   # radiator.momentumDynamics
+ -2       0                 -100000                  100000                
+  6   256   # radiator.m_flow_start
+ -2       1                       1                 1.0000000000000000E+100
+  6   258   # radiator.nNodes
+ -2       2                       1                       4                
+  6   258   # radiator.modelStructure
+ -2       0                       0                       0                
+  6   257   # radiator.useLumpedPressure
+ -2       2                       0                       0                
+  6   258   # radiator.nFM
+ -2       2                       0                       0                
+  6   258   # radiator.nFMDistributed
+ -2       2                       0                       0                
+  6   258   # radiator.nFMLumped
+ -2       1                       0                       0                
+  6   258   # radiator.iLumped
+ -2       0                       0                       0                
+  6   257   # radiator.useInnerPortProperties
+ -2  3.4301135304906705E+02       1                   10000                
+  6   256   # radiator.state_a.T
+ -2  3.1228533206033194E+02       1                   10000                
+  6   256   # radiator.state_b.T
+ -2       1                       0                       0                
+  6   257   # radiator.flowModel.from_dp
+ -2       3                       0                       0                
+  6   258   # radiator.flowModel.n
+ -2       1                       0                       0                
+  6   256   # radiator.flowModel.nParallel
+ -2       0                       0                       0                
+  6   256   # radiator.flowModel.dheights[1]
+ -2       0                       0                       0                
+  6   256   # radiator.flowModel.dheights[2]
+ -2  9.8066499999999994E+00       0                       0                
+  6   256   # radiator.flowModel.g
+ -2       1                       0                       0                
+  6   257   # radiator.flowModel.allowFlowReversal
+ -2       4                       1                       4                
+  6   258   # radiator.flowModel.momentumDynamics
+ -2       0                 -100000                  100000                
+  6   256   # radiator.flowModel.m_flow_start
+ -2  1.1000000000000000E+05       0                  1.0000000000000000E+08
+  6   256   # radiator.flowModel.p_a_start
+ -2  1.1000000000000000E+05       0                  1.0000000000000000E+08
+  6   256   # radiator.flowModel.p_b_start
+ -2       2                       0                       0                
+  6   258   # radiator.flowModel.m
+ -2  6.6541360585555140E-02       0                       0                
+  6   256   # radiator.flowModel.Is[1]
+ -2  6.6541360585555140E-02       0                       0                
+  6   256   # radiator.flowModel.Is[2]
+ -2       0                       0                       0                
+  6   256   # radiator.flowModel.Ib_flows[1]
+ -2       0                       0                       0                
+  6   256   # radiator.flowModel.Ib_flows[2]
+ -2 -2.1420797843167808E-02       0                       0                
+  6   256   # radiator.flowModel.Fs_p[1]
+ -2 -2.1420797843166663E-02       0                       0                
+  6   256   # radiator.flowModel.Fs_p[2]
+ -2  6.1178261564408057E-15       0                       0                
+  6   256   # radiator.flowModel.der(Fs_p[1])
+ -2  6.1178261564403900E-15       0                       0                
+  6   256   # radiator.flowModel.der(Fs_p[2])
+ -2       1                       0                       0                
+  6   257   # radiator.flowModel.useUpstreamScheme
+ -2       0                       0                       0                
+  6   257   # radiator.flowModel.use_Ib_flows
+ -2  9.9558600000000001E+02       0                  100000                
+  6   256   # radiator.flowModel.rhos[1]
+ -2  9.9558600000000001E+02       0                  100000                
+  6   256   # radiator.flowModel.rhos[2]
+ -2  9.9558600000000001E+02       0                  100000                
+  6   256   # radiator.flowModel.rhos[3]
+ -2  9.9558600000000001E+02       0                  100000                
+  6   256   # radiator.flowModel.rhos_act[1]
+ -2  9.9558600000000001E+02       0                  100000                
+  6   256   # radiator.flowModel.rhos_act[2]
+ -2  1.0000000000000000E-03       0                  1.0000000000000000E+08
+  6   256   # radiator.flowModel.mus[1]
+ -2  1.0000000000000000E-03       0                  1.0000000000000000E+08
+  6   256   # radiator.flowModel.mus[2]
+ -2  1.0000000000000000E-03       0                  1.0000000000000000E+08
+  6   256   # radiator.flowModel.mus[3]
+ -2  1.0000000000000000E-03       0                  1.0000000000000000E+08
+  6   256   # radiator.flowModel.mus_act[1]
+ -2  1.0000000000000000E-03       0                  1.0000000000000000E+08
+  6   256   # radiator.flowModel.mus_act[2]
+ -2  2.7273806893698935E+02       0                       0                
+  6   256   # radiator.flowModel.dps_fg[1]
+ -2  2.7273806893697474E+02       0                       0                
+  6   256   # radiator.flowModel.dps_fg[2]
+ -2 -7.7894581901955611E-11       0                       0                
+  6   256   # radiator.flowModel.der(dps_fg[1])
+ -2 -7.7894581901950312E-11       0                       0                
+  6   256   # radiator.flowModel.der(dps_fg[2])
+ -2    4000                       0                       0                
+  6   256   # radiator.flowModel.Re_turbulent
+ -2       0                       0                       0                
+  6   257   # radiator.flowModel.show_Res
+ -2       0                       0                       0                
+  6  1281   # radiator.flowModel.use_rho_nominal
+ -1  9.9558600000000001E+02       0                 1.0000000000000000E+100
+  1  1304   # radiator.flowModel.rho_nominal
+ -2       0                       0                       0                
+  6  1281   # radiator.flowModel.use_mu_nominal
+ -1  1.0000000000000000E-03       0                 1.0000000000000000E+100
+  1  1304   # radiator.flowModel.mu_nominal
+ -2    4000                       0                       0                
+  6   256   # radiator.flowModel.Res_turbulent_internal[1]
+ -2    4000                       0                       0                
+  6   256   # radiator.flowModel.Res_turbulent_internal[2]
+ -2    1000                       0                 1.0000000000000000E+100
+  6   256   # radiator.flowModel.dp_nominal
+ -2  1.0000000000000000E-02       0                       0                
+  6   256   # radiator.flowModel.m_flow_nominal
+ -2  1.0000000000000000E-04       0                       0                
+  6   256   # radiator.flowModel.m_flow_small
+ -2       1                       0                 1.0000000000000000E+100
+  6  1280   # radiator.flowModel.dp_small
+ -2       0                       0                       0                
+  6  1281   # radiator.flowModel.constantPressureLossCoefficient
+ -2       0                       0                       0                
+  6  1281   # radiator.flowModel.continuousFlowReversal
+ -2  4.0924305315186439E+02       0                 1.0000000000000000E+100
+  6  1280   # radiator.flowModel.dp_fric_nominal
+ -2  3.8900066244059603E+03 -1.0000000000000000E+08  1.0000000000000000E+08
+  6   256   # radiator.H_flows[1]
+ -2  2.2530136906929706E+03 -1.0000000000000000E+08  1.0000000000000000E+08
+  6   256   # radiator.H_flows[2]
+ -2  1.7019743479319818E-01       0                       0                
+  6   256   # radiator.vs[1]
+ -2       5                       0                       0                
+  6  1280   # radiator.pathLengths[1]
+ -2       5                       0                       0                
+  6  1280   # radiator.pathLengths[2]
+ -2       0                       0                       0                
+  6  1280   # radiator.dheightsFM[1]
+ -2       0                       0                       0                
+  6  1280   # radiator.dheightsFM[2]
+ -2  1.7019743479319818E-01       0                       0                
+  6  1280   # radiator.vsFM[1]
+ -2  1.7019743479319818E-01       0                       0                
+  6  1280   # radiator.vsFM[3]
+ -2       1                       0                       0                
+  6   257   # radiator.use_HeatTransfer
+ -2       1                       0                       0                
+  6   258   # radiator.heatTransfer.n
+ -2  3.1415926535897931E-01       0                       0                
+  6   256   # radiator.heatTransfer.surfaceAreas[1]
+ -2       1                       0                       0                
+  6   257   # radiator.heatTransfer.use_k
+ -2       0                       0                       0                
+  6   256   # radiator.heatTransfer.k
+ -2  2.9314999999999998E+02       0                 1.0000000000000000E+100
+  6   256   # radiator.heatTransfer.T_ambient
+ -2       1                       0                       0                
+  6   256   # radiator.heatTransfer.nParallel
+ -2       1                       0                       0                
+  6   256   # radiator.dxs[1]
+ -2  3.4301176114687098E+02       0                 1.0000000000000000E+100
+  4  1280   # T_forward
+ -2  3.1361229224453297E+02       0                 1.0000000000000000E+100
+  4  1280   # T_return
+ -2       0                       0                  100000                
+  6   388   # sensor_T_forward.port.m_flow
+ -2   83680                 -1.0000000000000000E+10  1.0000000000000000E+10
+  6   260   # sensor_T_forward.port.h_outflow
+ -2       1                       0                       1                
+  6  1280   # _GlobalScope.Modelica.Media.Interfaces.PartialPureSubstance.X_default[1]
+ -2       0                       0                  100000                
+  6   388   # sensor_T_return.port.m_flow
+ -2   83680                 -1.0000000000000000E+10  1.0000000000000000E+10
+  6   260   # sensor_T_return.port.h_outflow
+ -2  1.0000000778628892E+00       0                 1.0000000000000000E+100
+  4  1280   # tankLevel
+ -2       0                       0                       0                
+  6  1280   # der(tankLevel)
+ -1  9.0000000000000002E-01       0                       0                
+  1   280   # handle.height
+ -1  1.0000000000000001E-01       0                       0                
+  1   280   # handle.offset
+ -1    2000                       0                       0                
+  1   280   # handle.startTime
+ -2       1                       0                       0                
+  6   257   # pipe.allowFlowReversal
+ -2  2.9230077549044258E+05 -1.0000000000000000E+10  1.0000000000000000E+10
+  6   260   # pipe.port_a.h_outflow
+ -2       1                       0                       0                
+  6  1281   # pipe.port_a_exposesState
+ -2       1                       0                       0                
+  6  1281   # pipe.port_b_exposesState
+ -1       1                       0                       0                
+  1  1305   # pipe.showDesignFlowDirection
+ -1       1                       1                 1.0000000000000000E+100
+  1   280   # pipe.nParallel
+ -2      10                       0                       0                
+  6   256   # pipe.length
+ -2       1                       0                       0                
+  6   257   # pipe.isCircular
+ -1  1.0000000000000000E-02       0                 1.0000000000000000E+100
+  1   280   # pipe.diameter
+ -2  7.8539816339744841E-05       0                       0                
+  6   256   # pipe.crossArea
+ -2  3.1415926535897934E-02       0                       0                
+  6   256   # pipe.perimeter
+ -1  2.5000000000000001E-05       0                 1.0000000000000000E+100
+  1   280   # pipe.roughness
+ -2  7.8539816339744844E-04       0                       0                
+  6   256   # pipe.V
+ -2       0                       0                       0                
+  6   256   # pipe.height_ab
+ -2       2                       0                       0                
+  6   258   # pipe.n
+ -2  3.9269908169872422E-04       0                       0                
+  6   256   # pipe.fluidVolumes[1]
+ -2  3.9269908169872422E-04       0                       0                
+  6   256   # pipe.fluidVolumes[2]
+ -2       3                       1                       4                
+  6   258   # pipe.energyDynamics
+ -2       3                       1                       4                
+  6   258   # pipe.massDynamics
+ -2       3                       1                       4                
+  6   258   # pipe.substanceDynamics
+ -2       3                       1                       4                
+  6   258   # pipe.traceDynamics
+ -1  1.3000000000000000E+05       0                  1.0000000000000000E+08
+  1   280   # pipe.p_a_start
+ -2  1.3000000000000000E+05       0                  1.0000000000000000E+08
+  6   256   # pipe.p_b_start
+ -2  1.3000000000000000E+05       0                  1.0000000000000000E+08
+  6   256   # pipe.ps_start[1]
+ -2  1.3000000000000000E+05       0                  1.0000000000000000E+08
+  6   256   # pipe.ps_start[2]
+ -2       1                       0                       0                
+  6   257   # pipe.use_T_start
+ -2  3.5314999999999998E+02       1                   10000                
+  6   256   # pipe.T_start
+ -2  3.3472000000000000E+05 -1.0000000000000000E+10  1.0000000000000000E+10
+  6   256   # pipe.h_start
+ -1       1                       0                       1                
+  1   280   # pipe.X_start[1]
+ -2  1.1427957962457050E+05       0                       0                
+  6   256   # pipe.Us[1]
+ -2  1.1427923779029312E+05       0                       0                
+  6   256   # pipe.Us[2]
+ -2  1.1087761172802857E-02       0                       0                
+  6   256   # pipe.der(Us[1])
+ -2  1.1635863426818105E-02       0                       0                
+  6   256   # pipe.der(Us[2])
+ -2  3.9096570795210606E-01       0                 1.0000000000000000E+100
+  6   256   # pipe.ms[1]
+ -2  3.9096570795210606E-01       0                 1.0000000000000000E+100
+  6   256   # pipe.ms[2]
+ -2       0                 -100000                  100000                
+  6   256   # pipe.der(ms[1])
+ -2       0                 -100000                  100000                
+  6   256   # pipe.der(ms[2])
+ -2       0                 -100000                  100000                
+  6   256   # pipe.mb_flows[1]
+ -2       0                 -100000                  100000                
+  6   256   # pipe.mb_flows[2]
+ -2  1.1087761172802857E-02       0                       0                
+  6   256   # pipe.Hb_flows[1]
+ -2  1.1635863426818105E-02       0                       0                
+  6   256   # pipe.Hb_flows[2]
+ -2       0                       0                       0                
+  6   256   # pipe.Qb_flows[1]
+ -2       0                       0                       0                
+  6   256   # pipe.Qb_flows[2]
+ -2       0                       0                       0                
+  6   256   # pipe.Wb_flows[1]
+ -2       0                       0                       0                
+  6   256   # pipe.Wb_flows[2]
+ -2       0                       0                       0                
+  6  1281   # pipe.initialize_p
+ -2       5                       0                       0                
+  6   256   # pipe.lengths[1]
+ -2       5                       0                       0                
+  6   256   # pipe.lengths[2]
+ -2  7.8539816339744841E-05       0                       0                
+  6   256   # pipe.crossAreas[1]
+ -2  7.8539816339744841E-05       0                       0                
+  6   256   # pipe.crossAreas[2]
+ -2  1.0000000000000000E-02       0                       0                
+  6   256   # pipe.dimensions[1]
+ -2  1.0000000000000000E-02       0                       0                
+  6   256   # pipe.dimensions[2]
+ -2  2.5000000000000001E-05       0                 1.0000000000000000E+100
+  6   256   # pipe.roughnesses[1]
+ -2  2.5000000000000001E-05       0                 1.0000000000000000E+100
+  6   256   # pipe.roughnesses[2]
+ -2       0                       0                       0                
+  6   256   # pipe.dheights[1]
+ -2       0                       0                       0                
+  6   256   # pipe.dheights[2]
+ -2       4                       1                       4                
+  6   258   # pipe.momentumDynamics
+ -2       0                 -100000                  100000                
+  6   256   # pipe.m_flow_start
+ -2       2                       1                 1.0000000000000000E+100
+  6   258   # pipe.nNodes
+ -2       1                       1                       4                
+  6   258   # pipe.modelStructure
+ -2       0                       0                       0                
+  6   257   # pipe.useLumpedPressure
+ -2       1                       0                       0                
+  6   258   # pipe.nFM
+ -2       1                       0                       0                
+  6   258   # pipe.nFMDistributed
+ -2       1                       0                       0                
+  6   258   # pipe.nFMLumped
+ -2       2                       0                       0                
+  6   258   # pipe.iLumped
+ -2       0                       0                       0                
+  6   257   # pipe.useInnerPortProperties
+ -2  3.4301176114687098E+02       1                   10000                
+  6   256   # pipe.state_a.T
+ -2  3.1361229224453297E+02       1                   10000                
+  6   256   # pipe.state_b.T
+ -2       1                       0                       0                
+  6   257   # pipe.flowModel.from_dp
+ -2       2                       0                       0                
+  6   258   # pipe.flowModel.n
+ -2       1                       0                       0                
+  6   256   # pipe.flowModel.nParallel
+ -2       0                       0                       0                
+  6   256   # pipe.flowModel.dheights[1]
+ -2  9.8066499999999994E+00       0                       0                
+  6   256   # pipe.flowModel.g
+ -2       1                       0                       0                
+  6   257   # pipe.flowModel.allowFlowReversal
+ -2       4                       1                       4                
+  6   258   # pipe.flowModel.momentumDynamics
+ -2       0                 -100000                  100000                
+  6   256   # pipe.flowModel.m_flow_start
+ -2  1.3000000000000000E+05       0                  1.0000000000000000E+08
+  6   256   # pipe.flowModel.p_a_start
+ -2  1.3000000000000000E+05       0                  1.0000000000000000E+08
+  6   256   # pipe.flowModel.p_b_start
+ -2       1                       0                       0                
+  6   258   # pipe.flowModel.m
+ -2      10                       0                       0                
+  6   256   # pipe.flowModel.pathLengths[1]
+ -2  1.3308272117111028E-01       0                       0                
+  6   256   # pipe.flowModel.Is[1]
+ -2       0                       0                       0                
+  6   256   # pipe.flowModel.Ib_flows[1]
+ -2 -4.2841595686334472E-02       0                       0                
+  6   256   # pipe.flowModel.Fs_p[1]
+ -2  1.2235652312881182E-14       0                       0                
+  6   256   # pipe.flowModel.der(Fs_p[1])
+ -2       1                       0                       0                
+  6   257   # pipe.flowModel.useUpstreamScheme
+ -2       0                       0                       0                
+  6   257   # pipe.flowModel.use_Ib_flows
+ -2  9.9558600000000001E+02       0                  100000                
+  6   256   # pipe.flowModel.rhos[1]
+ -2  9.9558600000000001E+02       0                  100000                
+  6   256   # pipe.flowModel.rhos[2]
+ -2  9.9558600000000001E+02       0                  100000                
+  6   256   # pipe.flowModel.rhos_act[1]
+ -2  1.0000000000000000E-03       0                  1.0000000000000000E+08
+  6   256   # pipe.flowModel.mus[1]
+ -2  1.0000000000000000E-03       0                  1.0000000000000000E+08
+  6   256   # pipe.flowModel.mus[2]
+ -2  1.0000000000000000E-03       0                  1.0000000000000000E+08
+  6   256   # pipe.flowModel.mus_act[1]
+ -2  5.4547613787396403E+02       0                       0                
+  6   256   # pipe.flowModel.dps_fg[1]
+ -2 -1.5578916380390577E-10       0                       0                
+  6   256   # pipe.flowModel.der(dps_fg[1])
+ -2    4000                       0                       0                
+  6   256   # pipe.flowModel.Re_turbulent
+ -2       0                       0                       0                
+  6   257   # pipe.flowModel.show_Res
+ -2       0                       0                       0                
+  6  1281   # pipe.flowModel.use_rho_nominal
+ -1  9.9558600000000001E+02       0                 1.0000000000000000E+100
+  1  1304   # pipe.flowModel.rho_nominal
+ -2       0                       0                       0                
+  6  1281   # pipe.flowModel.use_mu_nominal
+ -1  1.0000000000000000E-03       0                 1.0000000000000000E+100
+  1  1304   # pipe.flowModel.mu_nominal
+ -2      10                       0                       0                
+  6   256   # pipe.flowModel.pathLengths_internal[1]
+ -2    4000                       0                       0                
+  6   256   # pipe.flowModel.Res_turbulent_internal[1]
+ -2    1000                       0                 1.0000000000000000E+100
+  6   256   # pipe.flowModel.dp_nominal
+ -2  1.0000000000000000E-02       0                       0                
+  6   256   # pipe.flowModel.m_flow_nominal
+ -2  1.0000000000000000E-04       0                       0                
+  6   256   # pipe.flowModel.m_flow_small
+ -2       1                       0                 1.0000000000000000E+100
+  6  1280   # pipe.flowModel.dp_small
+ -2       0                       0                       0                
+  6  1281   # pipe.flowModel.constantPressureLossCoefficient
+ -2       0                       0                       0                
+  6  1281   # pipe.flowModel.continuousFlowReversal
+ -2  1.0000000000000000E-02       0                       0                
+  6  1280   # pipe.flowModel.diameters[1]
+ -2  4.0924305315186439E+02       0                 1.0000000000000000E+100
+  6  1280   # pipe.flowModel.dp_fric_nominal
+ -2  3.8900293480305600E+03 -1.0000000000000000E+08  1.0000000000000000E+08
+  6   256   # pipe.H_flows[1]
+ -2  3.8900182602693872E+03 -1.0000000000000000E+08  1.0000000000000000E+08
+  6   256   # pipe.H_flows[2]
+ -2  3.8900066244059603E+03 -1.0000000000000000E+08  1.0000000000000000E+08
+  6   256   # pipe.H_flows[3]
+ -2  1.7019743479319818E-01       0                       0                
+  6   256   # pipe.vs[1]
+ -2  1.7019743479319818E-01       0                       0                
+  6   256   # pipe.vs[2]
+ -2      10                       0                       0                
+  6  1280   # pipe.pathLengths[1]
+ -2       0                       0                       0                
+  6  1280   # pipe.dheightsFM[1]
+ -2       0                       0                       0                
+  6   257   # pipe.use_HeatTransfer
+ -2       2                       0                       0                
+  6   258   # pipe.heatTransfer.n
+ -2  1.5707963267948966E-01       0                       0                
+  6   256   # pipe.heatTransfer.surfaceAreas[1]
+ -2  1.5707963267948966E-01       0                       0                
+  6   256   # pipe.heatTransfer.surfaceAreas[2]
+ -2       0                       0                       0                
+  6   256   # pipe.heatTransfer.Q_flows[1]
+ -2       0                       0                       0                
+  6   256   # pipe.heatTransfer.Q_flows[2]
+ -2       0                       0                       0                
+  6   257   # pipe.heatTransfer.use_k
+ -2       0                       0                       0                
+  6   256   # pipe.heatTransfer.k
+ -2  2.9314999999999998E+02       0                 1.0000000000000000E+100
+  6   256   # pipe.heatTransfer.T_ambient
+ -2       0                       0                       0                
+  6   388   # pipe.heatTransfer.heatPorts[1].Q_flow
+ -2       0                       0                       0                
+  6   388   # pipe.heatTransfer.heatPorts[2].Q_flow
+ -2       1                       0                       0                
+  6   256   # pipe.heatTransfer.nParallel
+ -2       5                       0                       0                
+  6   256   # pipe.heatTransfer.lengths[1]
+ -2       5                       0                       0                
+  6   256   # pipe.heatTransfer.lengths[2]
+ -2  5.0000000000000000E-01       0                       0                
+  6   256   # pipe.dxs[1]
+ -2  5.0000000000000000E-01       0                       0                
+  6   256   # pipe.dxs[2]
+ -2  1.2994545238621261E+05       0                  1.0000000000000000E+08
+  6   256   # heater.mediums[1].p
+ -2  1.5578916380388967E-11       0                       0                
+  6   256   # heater.mediums[1].der(p)
+ -2  9.9558600000000001E+02       0                  100000                
+  6   256   # heater.mediums[1].d
+ -2  3.4301176114687098E+02       1                   10000                
+  2   272   # heater.mediums[1].T
+ -2  6.4758712429157127E-06       0                       0                
+  3   256   # heater.mediums[1].der(T)
+ -2       1                       0                       1                
+  6   256   # heater.mediums[1].X[1]
+ -2  2.9230160863850830E+05 -1.0000000000000000E+08  1.0000000000000000E+08
+  6   256   # heater.mediums[1].u
+ -2  2.7095045280359338E-02       0                       0                
+  6   256   # heater.mediums[1].der(u)
+ -2       0                       0                  1.0000000000000000E+07
+  6   256   # heater.mediums[1].R
+ -2  1.8015268000000001E-02  1.0000000000000000E-03  2.5000000000000000E-01
+  6   256   # heater.mediums[1].MM
+ -2       1                       0                       0                
+  6   257   # heater.mediums[1].preferredMediumStates
+ -2       1                       0                       0                
+  6   257   # heater.mediums[1].standardOrderComponents
+ -2  6.9861761146871004E+01       0                       0                
+  6   256   # heater.mediums[1].T_degC
+ -2  1.2994545238621262E+00       0                       0                
+  6   256   # heater.mediums[1].p_bar
+ -2  1.1136167995163206E+05       0                  1.0000000000000000E+08
+  6   256   # radiator.mediums[1].p
+ -2 -7.8204920529612193E-11       0                       0                
+  6   256   # radiator.mediums[1].der(p)
+ -2  9.9558600000000001E+02       0                  100000                
+  6   256   # radiator.mediums[1].d
+ -2  3.1361229224453297E+02       1                   10000                
+  2   272   # radiator.mediums[1].T
+ -2  2.9203286775138135E-06       0                       0                
+  3   256   # radiator.mediums[1].der(T)
+ -2       1                       0                       1                
+  6   256   # radiator.mediums[1].X[1]
+ -2  1.6929423075112602E+05 -1.0000000000000000E+08  1.0000000000000000E+08
+  6   256   # radiator.mediums[1].u
+ -2  1.2218655186717796E-02       0                       0                
+  6   256   # radiator.mediums[1].der(u)
+ -2       0                       0                  1.0000000000000000E+07
+  6   256   # radiator.mediums[1].R
+ -2  1.8015268000000001E-02  1.0000000000000000E-03  2.5000000000000000E-01
+  6   256   # radiator.mediums[1].MM
+ -2       1                       0                       0                
+  6   257   # radiator.mediums[1].preferredMediumStates
+ -2       1                       0                       0                
+  6   257   # radiator.mediums[1].standardOrderComponents
+ -2  4.0462292244532989E+01       0                       0                
+  6   256   # radiator.mediums[1].T_degC
+ -2  1.1136167995163206E+00       0                       0                
+  6   256   # radiator.mediums[1].p_bar
+ -2  1.2989090477242520E+05       0                  1.0000000000000000E+08
+  6   256   # pipe.mediums[1].p
+ -2  3.1157832760783143E-11       0                       0                
+  6   256   # pipe.mediums[1].der(p)
+ -2  9.9558600000000001E+02       0                  100000                
+  6   256   # pipe.mediums[1].d
+ -2  3.4301156201970423E+02       1                   10000                
+  2   272   # pipe.mediums[1].T
+ -2  6.7781865962245110E-06       0                       0                
+  3   256   # pipe.mediums[1].der(T)
+ -2       1                       0                       1                
+  6   256   # pipe.mediums[1].X[1]
+ -2  2.9230077549044258E+05 -1.0000000000000000E+08  1.0000000000000000E+08
+  6   256   # pipe.mediums[1].u
+ -2  2.8359932718603355E-02       0                       0                
+  6   256   # pipe.mediums[1].der(u)
+ -2       0                       0                  1.0000000000000000E+07
+  6   256   # pipe.mediums[1].R
+ -2  1.8015268000000001E-02  1.0000000000000000E-03  2.5000000000000000E-01
+  6   256   # pipe.mediums[1].MM
+ -2       1                       0                       0                
+  6   257   # pipe.mediums[1].preferredMediumStates
+ -2       1                       0                       0                
+  6   257   # pipe.mediums[1].standardOrderComponents
+ -2  6.9861562019704252E+01       0                       0                
+  6   256   # pipe.mediums[1].T_degC
+ -2  1.2989090477242522E+00       0                       0                
+  6   256   # pipe.mediums[1].p_bar
+ -2  1.2934542863455124E+05       0                  1.0000000000000000E+08
+  6   256   # pipe.mediums[2].p
+ -2  1.8694699656468889E-10       0                       0                
+  6   256   # pipe.mediums[2].der(p)
+ -2  9.9558600000000001E+02       0                  100000                
+  6   256   # pipe.mediums[2].d
+ -2  3.4301135304906705E+02       1                   10000                
+  2   272   # pipe.mediums[2].T
+ -2  7.1132532786346135E-06       0                       0                
+  3   256   # pipe.mediums[2].der(T)
+ -2       1                       0                       1                
+  6   256   # pipe.mediums[2].X[1]
+ -2  2.9229990115729667E+05 -1.0000000000000000E+08  1.0000000000000000E+08
+  6   256   # pipe.mediums[2].u
+ -2  2.9761851717807222E-02       0                       0                
+  6   256   # pipe.mediums[2].der(u)
+ -2       0                       0                  1.0000000000000000E+07
+  6   256   # pipe.mediums[2].R
+ -2  1.8015268000000001E-02  1.0000000000000000E-03  2.5000000000000000E-01
+  6   256   # pipe.mediums[2].MM
+ -2       1                       0                       0                
+  6   257   # pipe.mediums[2].preferredMediumStates
+ -2       1                       0                       0                
+  6   257   # pipe.mediums[2].standardOrderComponents
+ -2  6.9861353049067077E+01       0                       0                
+  6   256   # pipe.mediums[2].T_degC
+ -2  1.2934542863455125E+00       0                       0                
+  6   256   # pipe.mediums[2].p_bar
+ -2  1.3900000000000001E-01       0                       0                
+  4   256   # CPUtime
+ -2       4                       0                       0                
+  4   256   # EventCounter
+ -2  1.1163441802056905E+05       0                       0                
+  2   272   # stateSelect.set1.x[1]
+ -2 -1.5609950243156780E-10       0                       0                
+  3   256   # stateSelect.set1.der(x[1])
+ -2  1.6301948383328738E+06       0                       0                
+  2   272   # stateSelect.set1.x[2]
+ -2  4.1410210830535732E+00       0                       0                
+  3   256   # stateSelect.set1.der(x[2])
+ -2  1.2934542863455124E+05       0                       0                
+  2   272   # stateSelect.set1.x[3]
+ -2  1.8694699656468889E-10       0                       0                
+  3   256   # stateSelect.set1.der(x[3])
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[1, 1]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[1, 2]
+ -2       1                       0                       0                
+  6   256   # stateSelect.set1.P[1, 3]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[1, 4]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[1, 5]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[1, 6]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[1, 7]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[1, 8]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[1, 9]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[1, 10]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[1, 11]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[1, 12]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[1, 13]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[2, 1]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[2, 2]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[2, 3]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[2, 4]
+ -2       1                       0                       0                
+  6   256   # stateSelect.set1.P[2, 5]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[2, 6]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[2, 7]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[2, 8]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[2, 9]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[2, 10]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[2, 11]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[2, 12]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[2, 13]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[3, 1]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[3, 2]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[3, 3]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[3, 4]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[3, 5]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[3, 6]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[3, 7]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[3, 8]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[3, 9]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[3, 10]
+ -2       1                       0                       0                
+  6   256   # stateSelect.set1.P[3, 11]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[3, 12]
+ -2       0                       0                       0                
+  6   256   # stateSelect.set1.P[3, 13]
+
+
+# Matrix with 6 columns defining the initial value calculation
+# (columns 5 and 6 are not utilized for the calculation but are
+#  reported by dymosim via dymosim -i for user convenience):
+#
+# column 1: Type of initial value
+#           = -2: special case: for continuing simulation (column 2 = value)
+#           = -1: fixed value (column 2 = fixed value)
+#           =  0: free value, i.e., no restriction (column 2 = initial value)
+#           >  0: desired value (column 1 = weight for optimization
+#                                column 2 = desired value)
+#                 use weight=1, since automatic scaling usually
+#                 leads to equally weighted terms
+# column 2: fixed, free or desired value according to column 1.
+# column 3: Minimum value (ignored, if Minimum >= Maximum).
+# column 4: Maximum value (ignored, if Minimum >= Maximum).
+#           Minimum and maximum restrict the search range in initial
+#           value calculation. They might also be used for scaling.
+# column 5: Category of variable.
+#           = 1: parameter.
+#           = 2: state.
+#           = 3: state derivative.
+#           = 4: output.
+#           = 5: input.
+#           = 6: auxiliary variable.
+# column 6: Data type of variable and flags according to dsBaseType
+#  <value>&3= 0: real.
+#  <value>&3= 1: boolean.
+#  <value>&3= 2: integer.
+#
+# Initial values are calculated according to the following procedure:
+#
+# - If parameters, states and inputs are FIXED, and other variables
+#   are FREE, no special action takes place (default setting).
+#
+# - If there are only FIXED and FREE variables and the number of
+#   FREE parameters, states and inputs is IDENTICAL to the number of
+#   FIXED state derivatives, outputs and auxiliary variables, a non-linear
+#   equation is solved to determine a consistent set of initial conditions.
+#
+# - In all other cases the following optimization problem is solved:
+#      min( sum( weight(i)*( (value(i) - DESIRED(i))/scale(i) )^2 ) )
+#   under the constraint that the differential equation is fulfilled
+#   at the initial time. In most cases weight(i)=1 is sufficient, due
+#   to the automatic scaling (if DESIRED(i) is not close to zero,
+#   scale(i) = DESIRED(i). Otherwise, the scaling is based on the
+#   nominal value (and maybe minimum and maximum values given in 
+#   column 3 and 4). If these values are zero, scale(i)=1 is used).
+#
+char initialDescription(764,123)
+Default ambient pressure [Pa|bar]
+Default ambient temperature [K|degC]
+Constant gravity acceleration [m/s2]
+= false to restrict to design flow direction (port_a -> port_b) [:#(type=Boolean)]
+Default formulation of energy balances [:#(type=Modelica.Fluid.Types.Dynamics)]
+Default formulation of mass balances [:#(type=Modelica.Fluid.Types.Dynamics)]
+Default formulation of substance balances [:#(type=Modelica.Fluid.Types.Dynamics)]
+Default formulation of trace substance balances [:#(type=Modelica.Fluid.Types.Dynamics)]
+Default formulation of momentum balances, if options available [:#(type=Modelica.Fluid.Types.Dynamics)]
+Default start value for mass flow rates [kg/s]
+Default start value for pressures [Pa|bar]
+Default start value for temperatures [K|degC]
+= true to determine turbulent region automatically using Reynolds number [:#(type=Boolean)]
+Default nominal mass flow rate [kg/s]
+Regularization of zero flow for |m_flow| < eps_m_flow*m_flow_nominal
+Default small pressure drop for regularization of laminar and zero flow [Pa|bar]
+Default small mass flow rate for regularization of laminar and zero flow [kg/s]
+Level height of tank [m]
+Actual tank volume [m3]
+der(Actual tank volume) [m3/s]
+Height of tank [m]
+Area of tank [m2]
+Tank surface pressure [Pa|bar]
+Tank surface Temperature [K|degC]
+Start value of tank level [m]
+Formulation of energy balance [:#(type=Modelica.Fluid.Types.Dynamics)]
+Formulation of mass balance [:#(type=Modelica.Fluid.Types.Dynamics)]
+Formulation of substance balance [:#(type=Modelica.Fluid.Types.Dynamics)]
+Formulation of trace substance balance [:#(type=Modelica.Fluid.Types.Dynamics)]
+Start value of pressure [Pa|bar]
+= true, use T_start, otherwise h_start [:#(type=Boolean)]
+Start value of temperature [K|degC]
+Start value of specific enthalpy [J/kg]
+Start value of mass fractions m_i/m [kg/kg]
+Absolute pressure of medium [Pa|bar]
+Density of medium [kg/m3|g/cm3]
+Temperature of medium [K|degC]
+der(Temperature of medium) [K/s]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Specific internal energy of medium [J/kg]
+der(Specific internal energy of medium) [m2/s3]
+Gas constant (of mixture if applicable) [J/(kg.K)]
+Molar mass (of mixture or single fluid) [kg/mol]
+= true if StateSelect.prefer shall be used for the independent property variables of the medium [:#(type=Boolean)]
+If true, and reducedX = true, the last element of X will be computed from the other ones [:#(type=Boolean)]
+Temperature of medium in [degC] [degC;]
+Absolute pressure of medium in [bar] [bar]
+Internal energy of fluid [J]
+der(Internal energy of fluid) [W]
+Mass of fluid [kg]
+der(Mass of fluid) [kg/s]
+Mass flows across boundaries [kg/s]
+Enthalpy flow across boundaries or energy source/sink [W]
+Heat flow across boundaries or energy source/sink [W]
+Work flow across boundaries or source term [W]
+= true to set up initial equations for pressure [:#(type=Boolean)]
+Number of ports [:#(type=Integer)]
+Thermodynamic pressure in the connection point [Pa|bar]
+der(Thermodynamic pressure in the connection point) [Pa/s]
+Specific thermodynamic enthalpy close to the connection point if m_flow < 0 [J/kg]
+der(Specific thermodynamic enthalpy close to the connection point if m_flow < 0) [m2/s3]
+Thermodynamic pressure in the connection point [Pa|bar]
+der(Thermodynamic pressure in the connection point) [Pa/s]
+= false to neglect pressure loss and kinetic energy [:#(type=Boolean)]
+Inner (hydraulic) diameter of inlet/outlet port [m]
+Height over the bottom of the vessel [m]
+Hydraulic resistance out of vessel, default 0.5 for small diameter mounted flush with the wall
+Hydraulic resistance into vessel, default 1.04 for small diameter mounted flush with the wall
+Inner (hydraulic) diameter of inlet/outlet port [m]
+Height over the bottom of the vessel [m]
+Hydraulic resistance out of vessel, default 0.5 for small diameter mounted flush with the wall
+Hydraulic resistance into vessel, default 1.04 for small diameter mounted flush with the wall
+Nominal value for mass flow rates in ports [kg/s]
+Regularization range at zero mass flow rate [kg/s]
+= true, if turbulent region is defined by Re, otherwise by m_flow_small [:#(type=Boolean)]
+[W]
+[W]
+= true to use the HeatTransfer model [:#(type=Boolean)]
+Number of heat transfer segments [:#(type=Integer)]
+Heat transfer areas [m2]
+= true to use k value for thermal isolation [:#(type=Boolean)]
+Heat transfer coefficient to ambient [W/(m2.K)]
+Ambient temperature [K|degC]
+Heat flow rate (positive if flowing from outside into the component) [W]
+Heat flow rate (positive if flowing from outside into the component) [W]
+densities of the fluid at the device boundary [kg/m3|g/cm3]
+densities of the fluid at the device boundary [kg/m3|g/cm3]
+velocities of fluid flow at device boundary [m/s]
+velocities of fluid flow at device boundary [m/s]
+flow of kinetic and potential energy at device boundary [W]
+flow of kinetic and potential energy at device boundary [W]
+curve parameters for port flows vs. port pressures; for further details see, Modelica Tutorial: Ideal switching devices
+curve parameters for port flows vs. port pressures; for further details see, Modelica Tutorial: Ideal switching devices
+penetration of port with fluid, depending on fluid level and port diameter
+penetration of port with fluid, depending on fluid level and port diameter
+der(penetration of port with fluid, depending on fluid level and port diameter)
+der(penetration of port with fluid, depending on fluid level and port diameter)
+[m2]
+[m2]
+static pressures inside the vessel at the height of the corresponding ports, zero flow velocity [Pa|bar]
+static pressures inside the vessel at the height of the corresponding ports, zero flow velocity [Pa|bar]
+der(static pressures inside the vessel at the height of the corresponding ports, zero flow velocity) [Pa/s]
+der(static pressures inside the vessel at the height of the corresponding ports, zero flow velocity) [Pa/s]
+cf. suddenExpansion [1]
+maximum level of fluid in the vessel [m]
+Area of the vessel used to relate to cross flow area of ports [m2]
+[:#(type=Boolean)]
+[:#(type=Boolean)]
+[:#(type=Boolean)]
+[:#(type=Boolean)]
+[m]
+= true to allow flow reversal, false restricts to design direction (port_a -> port_b) [:#(type=Boolean)]
+Specific thermodynamic enthalpy close to the connection point if m_flow < 0 [J/kg]
+der(Specific thermodynamic enthalpy close to the connection point if m_flow < 0) [m2/s3]
+= true if port_a exposes the state of a fluid volume [:#(type=Boolean)]
+= true if port_b.p exposes the state of a fluid volume [:#(type=Boolean)]
+= false to hide the arrow in the model icon [:#(type=Boolean)]
+Guess value for inlet pressure [Pa|bar]
+Guess value for outlet pressure [Pa|bar]
+Guess value of m_flow = port_a.m_flow [kg/s]
+Used for simplified initialization model [m3/s]
+Used for simplified initialization model [m]
+Number of pumps in parallel [:#(type=Integer)]
+Nominal rotational speed for flow characteristic [rev/min]
+Nominal fluid density for characteristic [kg/m3|g/cm3]
+Use powerCharacteristic (vs. efficiencyCharacteristic) [:#(type=Boolean)]
+= true to prevent reverse flow [:#(type=Boolean)]
+Volume inside the pump [m3]
+Volume [m3]
+Formulation of energy balance [:#(type=Modelica.Fluid.Types.Dynamics)]
+Formulation of mass balance [:#(type=Modelica.Fluid.Types.Dynamics)]
+Formulation of substance balance [:#(type=Modelica.Fluid.Types.Dynamics)]
+Formulation of trace substance balance [:#(type=Modelica.Fluid.Types.Dynamics)]
+Start value of pressure [Pa|bar]
+= true, use T_start, otherwise h_start [:#(type=Boolean)]
+Start value of temperature [K|degC]
+Start value of specific enthalpy [J/kg]
+Start value of mass fractions m_i/m [kg/kg]
+der(Absolute pressure of medium) [Pa/s]
+Density of medium [kg/m3|g/cm3]
+Temperature of medium [K|degC]
+der(Temperature of medium) [K/s]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Specific internal energy of medium [J/kg]
+Gas constant (of mixture if applicable) [J/(kg.K)]
+Molar mass (of mixture or single fluid) [kg/mol]
+= true if StateSelect.prefer shall be used for the independent property variables of the medium [:#(type=Boolean)]
+If true, and reducedX = true, the last element of X will be computed from the other ones [:#(type=Boolean)]
+Temperature of medium in [degC] [degC;]
+Absolute pressure of medium in [bar] [bar]
+Internal energy of fluid [J]
+Mass of fluid [kg]
+Mass flows across boundaries [kg/s]
+Enthalpy flow across boundaries or energy source/sink [W]
+der(Enthalpy flow across boundaries or energy source/sink) [W/s]
+Heat flow across boundaries or energy source/sink [W]
+= true to set up initial equations for pressure [:#(type=Boolean)]
+= true to use a HeatTransfer model, e.g., for a housing [:#(type=Boolean)]
+Number of heat transfer segments [:#(type=Integer)]
+Heat transfer areas [m2]
+Heat flow rates [W]
+= true to use k value for thermal isolation [:#(type=Boolean)]
+Heat transfer coefficient to ambient [W/(m2.K)]
+Ambient temperature [K|degC]
+Heat flow rate (positive if flowing from outside into the component) [W]
+[m/s2]
+[kg/m3|g/cm3]
+Pressure increase [Pa|bar]
+Pump head [m]
+Mass flow rate (single pump) [kg/s]
+Volume flow rate (total) [m3/s]
+der(Volume flow rate (total)) [m3/s2]
+Volume flow rate (single pump) [m3/s]
+der(Volume flow rate (single pump)) [m3/s2]
+Shaft rotational speed [rev/min]
+Power Consumption (single pump) [W]
+der(Power Consumption (single pump)) [W/s]
+Global Efficiency
+[kg/s]
+Curvilinear abscissa for the flow curve in parametric form (either mass flow rate or head)
+obsolete -- remove modifier and specify Monitoring for NPSH instead [:#(type=Boolean)]
+Temperature of medium [K|degC]
+[m]
+[kg/s]
+Nominal inlet pressure for predefined pump characteristics [Pa|bar]
+Nominal outlet pressure, fixed if not control_m_flow and not use_p_set [Pa|bar]
+Nominal mass flow rate, fixed if control_m_flow and not use_m_flow_set [kg/s]
+= false to control outlet pressure port_b.p instead of m_flow [:#(type=Boolean)]
+= true to use input signal m_flow_set instead of m_flow_nominal [:#(type=Boolean)]
+= true to use input signal p_set instead of p_b_nominal [:#(type=Boolean)]
+operational volume flow rate according to nominal values [m3/s]
+operational pump head according to nominal values [m]
+= true to allow flow reversal, false restricts to design direction (port_a -> port_b) [:#(type=Boolean)]
+Specific thermodynamic enthalpy close to the connection point if m_flow < 0 [J/kg]
+Thermodynamic pressure in the connection point [Pa|bar]
+der(Thermodynamic pressure in the connection point) [Pa/s]
+Specific thermodynamic enthalpy close to the connection point if m_flow < 0 [J/kg]
+= true if port_a exposes the state of a fluid volume [:#(type=Boolean)]
+= true if port_b.p exposes the state of a fluid volume [:#(type=Boolean)]
+= false to hide the arrow in the model icon [:#(type=Boolean)]
+Guess value of dp = port_a.p - port_b.p [Pa|bar]
+Guess value of m_flow = port_a.m_flow [kg/s]
+Small mass flow rate for regularization of zero flow [kg/s]
+= true, if temperatures at port_a and port_b are computed [:#(type=Boolean)]
+= true, if volume flow rate at inflowing port is computed [:#(type=Boolean)]
+Pressure difference between port_a and port_b (= port_a.p - port_b.p) [Pa|bar]
+der(Pressure difference between port_a and port_b (= port_a.p - port_b.p)) [Pa/s]
+Volume flow rate at inflowing port (positive when flow from port_a to port_b) [m3/s]
+Temperature close to port_a, if show_T = true [K|degC]
+Temperature close to port_b, if show_T = true [K|degC]
+Temperature of medium [K|degC]
+Temperature of medium [K|degC]
+Selection of flow coefficient [:#(type=Modelica.Fluid.Types.CvTypes)]
+Av (metric) flow coefficient [m2]
+Kv (metric) flow coefficient [m3/h] []
+Cv (US) flow coefficient [USG/min] []
+Nominal pressure drop [Pa|bar]
+Nominal mass flowrate [kg/s]
+Nominal inlet density [kg/m3|g/cm3]
+Nominal opening
+= true, if opening is filtered with a 2nd order CriticalDamping filter [:#(type=Boolean)]
+Rise time of the filter (time to reach 99.6 % of an opening step) [s]
+The opening signal is limited by leakageOpening (to improve the numerics)
+Reverse flow stopped [:#(type=Boolean)]
+Regularisation of zero flow [Pa|bar]
+Conversion factor [m2]
+Conversion factor [m2]
+Valve position in the range 0..1
+Analog filter characteristics (CriticalDamping/Bessel/Butterworth/ChebyshevI) [:#(type=Modelica.Blocks.Types.AnalogFilter)]
+Type of filter (LowPass/HighPass/BandPass/BandStop) [:#(type=Modelica.Blocks.Types.FilterType)]
+Order of filter [:#(type=Integer)]
+Cut-off frequency [Hz]
+Gain (= amplitude of frequency response at zero frequency)
+Pass band ripple for Chebyshev filter (otherwise not used); > 0 required [dB]
+Band of band pass/stop filter is f_min (A=-3db*gain) .. f_cut (A=-3db*gain) [Hz]
+= true, if amplitude at f_cut = -3db, otherwise unmodified filter [:#(type=Boolean)]
+Type of initialization (no init/steady state/initial state/initial output) [:#(type=Modelica.Blocks.Types.Init)]
+[:#(type=Integer)]
+Initial or guess values of states
+Initial or guess values of states
+Initial value of output
+Nominal value of input (used for scaling the states)
+Filter states
+der(Filter states)
+Filter states
+der(Filter states)
+[:#(type=Integer)]
+[:#(type=Integer)]
+[:#(type=Integer)]
+[:#(type=Integer)]
+
+
+
+
+
+
+
+Lower limit of input signal
+Connector of Real output signal
+cf. straight pipe for fully open valve -- dp_turbulent increases for closing valve [1]
+= true, if turbulent region is defined by Re, otherwise by m_flow_small [:#(type=Boolean)]
+
+
+= true to allow flow reversal, false restricts to design direction (port_a -> port_b) [:#(type=Boolean)]
+Specific thermodynamic enthalpy close to the connection point if m_flow < 0 [J/kg]
+= true if port_a exposes the state of a fluid volume [:#(type=Boolean)]
+= true if port_b.p exposes the state of a fluid volume [:#(type=Boolean)]
+= false to hide the arrow in the model icon [:#(type=Boolean)]
+Nominal value of m_flow = port_a.m_flow [kg/s]
+Regularization for bi-directional flow in the region |m_flow| < m_flow_small (m_flow_small > 0 required) [kg/s]
+Fixed temperature at port [K|degC]
+Heat flow rate (positive if flowing from outside into the component) [W]
+port_a.T - port_b.T [K,]
+Constant thermal conductance of material [W/K]
+Fixed heat flow rate at port [W]
+Reference temperature [K|degC]
+Temperature coefficient of heat flow rate [1/K]
+Heat flow rate (positive if flowing from outside into the component) [W]
+= true to allow flow reversal, false restricts to design direction (port_a -> port_b) [:#(type=Boolean)]
+= true if port_a exposes the state of a fluid volume [:#(type=Boolean)]
+= true if port_b.p exposes the state of a fluid volume [:#(type=Boolean)]
+= false to hide the arrow in the model icon [:#(type=Boolean)]
+Number of identical parallel pipes
+Length [m]
+= true if cross sectional area is circular [:#(type=Boolean)]
+Diameter of circular pipe [m]
+Inner cross section area [m2]
+Inner perimeter [m]
+Average height of surface asperities (default: smooth steel pipe) [m]
+volume size [m3]
+Height(port_b) - Height(port_a) [m]
+Number of discrete volumes [:#(type=Integer)]
+Discretized volume, determine in inheriting class [m3]
+Formulation of energy balances [:#(type=Modelica.Fluid.Types.Dynamics)]
+Formulation of mass balances [:#(type=Modelica.Fluid.Types.Dynamics)]
+Formulation of substance balances [:#(type=Modelica.Fluid.Types.Dynamics)]
+Formulation of trace substance balances [:#(type=Modelica.Fluid.Types.Dynamics)]
+Start value of pressure at port a [Pa|bar]
+Start value of pressure at port b [Pa|bar]
+Start value of pressure [Pa|bar]
+Use T_start if true, otherwise h_start [:#(type=Boolean)]
+Start value of temperature [K|degC]
+Start value of specific enthalpy [J/kg]
+Start value of mass fractions m_i/m [kg/kg]
+Internal energy of fluid [J]
+der(Internal energy of fluid) [W]
+Fluid mass [kg]
+der(Fluid mass) [kg/s]
+Mass flow rate, source or sink [kg/s]
+Enthalpy flow rate, source or sink [W]
+Mechanical power, p*der(V) etc. [W]
+= true to set up initial equations for pressure [:#(type=Boolean)]
+lengths of flow segments [m]
+cross flow areas of flow segments [m2]
+hydraulic diameters of flow segments [m]
+Average heights of surface asperities [m]
+Differences in heights of flow segments [m]
+Formulation of momentum balances [:#(type=Modelica.Fluid.Types.Dynamics)]
+Start value for mass flow rate [kg/s]
+Number of discrete flow volumes [:#(type=Integer)]
+Determines whether flow or volume models are present at the ports [:#(type=Modelica.Fluid.Types.ModelStructure)]
+=true to lump pressure states together [:#(type=Boolean)]
+number of flow models in flowModel [:#(type=Integer)]
+[:#(type=Integer)]
+[:#(type=Integer)]
+Index of control volume with representative state if useLumpedPressure [:#(type=Integer)]
+=true to take port properties for flow models from internal control volumes [:#(type=Boolean)]
+Temperature of medium [K|degC]
+Temperature of medium [K|degC]
+= true, use m_flow = f(dp), otherwise dp = f(m_flow) [:#(type=Boolean)]
+Number of discrete flow volumes [:#(type=Integer)]
+number of identical parallel flow devices
+Height(states[2:n]) - Height(states[1:n-1]) [m]
+Height(states[2:n]) - Height(states[1:n-1]) [m]
+Constant gravity acceleration [m/s2]
+= true to allow flow reversal, false restricts to design direction (states[1] -> states[n+1]) [:#(type=Boolean)]
+Formulation of momentum balance [:#(type=Modelica.Fluid.Types.Dynamics)]
+Start value of mass flow rates [kg/s]
+Start value for p[1] at design inflow [Pa|bar]
+Start value for p[n+1] at design outflow [Pa|bar]
+Number of flow segments [:#(type=Integer)]
+Momenta of flow segments [kg.m/s]
+Momenta of flow segments [kg.m/s]
+Flow of momentum across boundaries [N]
+Flow of momentum across boundaries [N]
+Pressure forces [N]
+Pressure forces [N]
+der(Pressure forces) [N/s]
+der(Pressure forces) [N/s]
+= false to average upstream and downstream properties across flow segments [:#(type=Boolean)]
+= true to consider differences in flow of momentum through boundaries [:#(type=Boolean)]
+[kg/m3|g/cm3]
+[kg/m3|g/cm3]
+[kg/m3|g/cm3]
+Actual density per segment [kg/m3|g/cm3]
+Actual density per segment [kg/m3|g/cm3]
+[Pa.s]
+[Pa.s]
+[Pa.s]
+Actual viscosity per segment [Pa.s]
+Actual viscosity per segment [Pa.s]
+pressure drop between states [Pa|bar]
+pressure drop between states [Pa|bar]
+der(pressure drop between states) [Pa/s]
+der(pressure drop between states) [Pa/s]
+Start of turbulent regime, depending on type of flow device [1]
+= true, if Reynolds numbers are included for plotting [:#(type=Boolean)]
+= true, if rho_nominal is used, otherwise computed from medium [:#(type=Boolean)]
+Nominal density (e.g., rho_liquidWater = 995, rho_air = 1.2) [kg/m3|g/cm3]
+= true, if mu_nominal is used, otherwise computed from medium [:#(type=Boolean)]
+Nominal dynamic viscosity (e.g., mu_liquidWater = 1e-3, mu_air = 1.8e-5) [Pa.s]
+Re_turbulent used internally; to be defined by extending class [1]
+Re_turbulent used internally; to be defined by extending class [1]
+Nominal pressure loss (only for nominal models) [Pa|bar]
+Nominal mass flow rate [kg/s]
+Within regularization if |m_flows| < m_flow_small (may be wider for large discontinuities in static head) [kg/s]
+Within regularization if |dp| < dp_small (may be wider for large discontinuities in static head) [Pa|bar]
+= true if the pressure loss does not depend on fluid states [:#(type=Boolean)]
+= true if the pressure loss is continuous around zero flow [:#(type=Boolean)]
+pressure loss for nominal conditions [Pa|bar]
+Enthalpy flow rates of fluid across segment boundaries [W]
+Enthalpy flow rates of fluid across segment boundaries [W]
+mean velocities in flow segments [m/s]
+Lengths along flow path [m]
+Lengths along flow path [m]
+Differences in heights between flow segments [m]
+Differences in heights between flow segments [m]
+Mean velocities in flow segments [m/s]
+Mean velocities in flow segments [m/s]
+= true to use the HeatTransfer model [:#(type=Boolean)]
+Number of heat transfer segments [:#(type=Integer)]
+Heat transfer areas [m2]
+= true to use k value for thermal isolation [:#(type=Boolean)]
+Heat transfer coefficient to ambient [W/(m2.K)]
+Ambient temperature [K|degC]
+number of identical parallel flow devices
+
+= true to allow flow reversal, false restricts to design direction (port_a -> port_b) [:#(type=Boolean)]
+= true if port_a exposes the state of a fluid volume [:#(type=Boolean)]
+= true if port_b.p exposes the state of a fluid volume [:#(type=Boolean)]
+= false to hide the arrow in the model icon [:#(type=Boolean)]
+Number of identical parallel pipes
+Length [m]
+= true if cross sectional area is circular [:#(type=Boolean)]
+Diameter of circular pipe [m]
+Inner cross section area [m2]
+Inner perimeter [m]
+Average height of surface asperities (default: smooth steel pipe) [m]
+volume size [m3]
+Height(port_b) - Height(port_a) [m]
+Number of discrete volumes [:#(type=Integer)]
+Discretized volume, determine in inheriting class [m3]
+Formulation of energy balances [:#(type=Modelica.Fluid.Types.Dynamics)]
+Formulation of mass balances [:#(type=Modelica.Fluid.Types.Dynamics)]
+Formulation of substance balances [:#(type=Modelica.Fluid.Types.Dynamics)]
+Formulation of trace substance balances [:#(type=Modelica.Fluid.Types.Dynamics)]
+Start value of pressure at port a [Pa|bar]
+Start value of pressure at port b [Pa|bar]
+Start value of pressure [Pa|bar]
+Use T_start if true, otherwise h_start [:#(type=Boolean)]
+Start value of temperature [K|degC]
+Start value of specific enthalpy [J/kg]
+Start value of mass fractions m_i/m [kg/kg]
+Internal energy of fluid [J]
+der(Internal energy of fluid) [W]
+Fluid mass [kg]
+der(Fluid mass) [kg/s]
+Mass flow rate, source or sink [kg/s]
+Enthalpy flow rate, source or sink [W]
+Mechanical power, p*der(V) etc. [W]
+= true to set up initial equations for pressure [:#(type=Boolean)]
+lengths of flow segments [m]
+cross flow areas of flow segments [m2]
+hydraulic diameters of flow segments [m]
+Average heights of surface asperities [m]
+Differences in heights of flow segments [m]
+Formulation of momentum balances [:#(type=Modelica.Fluid.Types.Dynamics)]
+Start value for mass flow rate [kg/s]
+Number of discrete flow volumes [:#(type=Integer)]
+Determines whether flow or volume models are present at the ports [:#(type=Modelica.Fluid.Types.ModelStructure)]
+=true to lump pressure states together [:#(type=Boolean)]
+number of flow models in flowModel [:#(type=Integer)]
+[:#(type=Integer)]
+[:#(type=Integer)]
+Index of control volume with representative state if useLumpedPressure [:#(type=Integer)]
+=true to take port properties for flow models from internal control volumes [:#(type=Boolean)]
+Temperature of medium [K|degC]
+Temperature of medium [K|degC]
+= true, use m_flow = f(dp), otherwise dp = f(m_flow) [:#(type=Boolean)]
+Number of discrete flow volumes [:#(type=Integer)]
+number of identical parallel flow devices
+Height(states[2:n]) - Height(states[1:n-1]) [m]
+Height(states[2:n]) - Height(states[1:n-1]) [m]
+Constant gravity acceleration [m/s2]
+= true to allow flow reversal, false restricts to design direction (states[1] -> states[n+1]) [:#(type=Boolean)]
+Formulation of momentum balance [:#(type=Modelica.Fluid.Types.Dynamics)]
+Start value of mass flow rates [kg/s]
+Start value for p[1] at design inflow [Pa|bar]
+Start value for p[n+1] at design outflow [Pa|bar]
+Number of flow segments [:#(type=Integer)]
+Momenta of flow segments [kg.m/s]
+Momenta of flow segments [kg.m/s]
+Flow of momentum across boundaries [N]
+Flow of momentum across boundaries [N]
+Pressure forces [N]
+Pressure forces [N]
+der(Pressure forces) [N/s]
+der(Pressure forces) [N/s]
+= false to average upstream and downstream properties across flow segments [:#(type=Boolean)]
+= true to consider differences in flow of momentum through boundaries [:#(type=Boolean)]
+[kg/m3|g/cm3]
+[kg/m3|g/cm3]
+[kg/m3|g/cm3]
+Actual density per segment [kg/m3|g/cm3]
+Actual density per segment [kg/m3|g/cm3]
+[Pa.s]
+[Pa.s]
+[Pa.s]
+Actual viscosity per segment [Pa.s]
+Actual viscosity per segment [Pa.s]
+pressure drop between states [Pa|bar]
+pressure drop between states [Pa|bar]
+der(pressure drop between states) [Pa/s]
+der(pressure drop between states) [Pa/s]
+Start of turbulent regime, depending on type of flow device [1]
+= true, if Reynolds numbers are included for plotting [:#(type=Boolean)]
+= true, if rho_nominal is used, otherwise computed from medium [:#(type=Boolean)]
+Nominal density (e.g., rho_liquidWater = 995, rho_air = 1.2) [kg/m3|g/cm3]
+= true, if mu_nominal is used, otherwise computed from medium [:#(type=Boolean)]
+Nominal dynamic viscosity (e.g., mu_liquidWater = 1e-3, mu_air = 1.8e-5) [Pa.s]
+Re_turbulent used internally; to be defined by extending class [1]
+Re_turbulent used internally; to be defined by extending class [1]
+Nominal pressure loss (only for nominal models) [Pa|bar]
+Nominal mass flow rate [kg/s]
+Within regularization if |m_flows| < m_flow_small (may be wider for large discontinuities in static head) [kg/s]
+Within regularization if |dp| < dp_small (may be wider for large discontinuities in static head) [Pa|bar]
+= true if the pressure loss does not depend on fluid states [:#(type=Boolean)]
+= true if the pressure loss is continuous around zero flow [:#(type=Boolean)]
+pressure loss for nominal conditions [Pa|bar]
+Enthalpy flow rates of fluid across segment boundaries [W]
+Enthalpy flow rates of fluid across segment boundaries [W]
+mean velocities in flow segments [m/s]
+Lengths along flow path [m]
+Lengths along flow path [m]
+Differences in heights between flow segments [m]
+Differences in heights between flow segments [m]
+Mean velocities in flow segments [m/s]
+Mean velocities in flow segments [m/s]
+= true to use the HeatTransfer model [:#(type=Boolean)]
+Number of heat transfer segments [:#(type=Integer)]
+Heat transfer areas [m2]
+= true to use k value for thermal isolation [:#(type=Boolean)]
+Heat transfer coefficient to ambient [W/(m2.K)]
+Ambient temperature [K|degC]
+number of identical parallel flow devices
+
+
+
+Mass flow rate from the connection point into the component [kg/s]
+Specific thermodynamic enthalpy close to the connection point if m_flow < 0 [J/kg]
+Default value for mass fractions of medium (for initialization) [kg/kg]
+Mass flow rate from the connection point into the component [kg/s]
+Specific thermodynamic enthalpy close to the connection point if m_flow < 0 [J/kg]
+
+
+Height of step
+Offset of output signal y
+Output y = offset for time < startTime [s]
+= true to allow flow reversal, false restricts to design direction (port_a -> port_b) [:#(type=Boolean)]
+Specific thermodynamic enthalpy close to the connection point if m_flow < 0 [J/kg]
+= true if port_a exposes the state of a fluid volume [:#(type=Boolean)]
+= true if port_b.p exposes the state of a fluid volume [:#(type=Boolean)]
+= false to hide the arrow in the model icon [:#(type=Boolean)]
+Number of identical parallel pipes
+Length [m]
+= true if cross sectional area is circular [:#(type=Boolean)]
+Diameter of circular pipe [m]
+Inner cross section area [m2]
+Inner perimeter [m]
+Average height of surface asperities (default: smooth steel pipe) [m]
+volume size [m3]
+Height(port_b) - Height(port_a) [m]
+Number of discrete volumes [:#(type=Integer)]
+Discretized volume, determine in inheriting class [m3]
+Discretized volume, determine in inheriting class [m3]
+Formulation of energy balances [:#(type=Modelica.Fluid.Types.Dynamics)]
+Formulation of mass balances [:#(type=Modelica.Fluid.Types.Dynamics)]
+Formulation of substance balances [:#(type=Modelica.Fluid.Types.Dynamics)]
+Formulation of trace substance balances [:#(type=Modelica.Fluid.Types.Dynamics)]
+Start value of pressure at port a [Pa|bar]
+Start value of pressure at port b [Pa|bar]
+Start value of pressure [Pa|bar]
+Start value of pressure [Pa|bar]
+Use T_start if true, otherwise h_start [:#(type=Boolean)]
+Start value of temperature [K|degC]
+Start value of specific enthalpy [J/kg]
+Start value of mass fractions m_i/m [kg/kg]
+Internal energy of fluid [J]
+Internal energy of fluid [J]
+der(Internal energy of fluid) [W]
+der(Internal energy of fluid) [W]
+Fluid mass [kg]
+Fluid mass [kg]
+der(Fluid mass) [kg/s]
+der(Fluid mass) [kg/s]
+Mass flow rate, source or sink [kg/s]
+Mass flow rate, source or sink [kg/s]
+Enthalpy flow rate, source or sink [W]
+Enthalpy flow rate, source or sink [W]
+Heat flow rate, source or sink [W]
+Heat flow rate, source or sink [W]
+Mechanical power, p*der(V) etc. [W]
+Mechanical power, p*der(V) etc. [W]
+= true to set up initial equations for pressure [:#(type=Boolean)]
+lengths of flow segments [m]
+lengths of flow segments [m]
+cross flow areas of flow segments [m2]
+cross flow areas of flow segments [m2]
+hydraulic diameters of flow segments [m]
+hydraulic diameters of flow segments [m]
+Average heights of surface asperities [m]
+Average heights of surface asperities [m]
+Differences in heights of flow segments [m]
+Differences in heights of flow segments [m]
+Formulation of momentum balances [:#(type=Modelica.Fluid.Types.Dynamics)]
+Start value for mass flow rate [kg/s]
+Number of discrete flow volumes [:#(type=Integer)]
+Determines whether flow or volume models are present at the ports [:#(type=Modelica.Fluid.Types.ModelStructure)]
+=true to lump pressure states together [:#(type=Boolean)]
+number of flow models in flowModel [:#(type=Integer)]
+[:#(type=Integer)]
+[:#(type=Integer)]
+Index of control volume with representative state if useLumpedPressure [:#(type=Integer)]
+=true to take port properties for flow models from internal control volumes [:#(type=Boolean)]
+Temperature of medium [K|degC]
+Temperature of medium [K|degC]
+= true, use m_flow = f(dp), otherwise dp = f(m_flow) [:#(type=Boolean)]
+Number of discrete flow volumes [:#(type=Integer)]
+number of identical parallel flow devices
+Height(states[2:n]) - Height(states[1:n-1]) [m]
+Constant gravity acceleration [m/s2]
+= true to allow flow reversal, false restricts to design direction (states[1] -> states[n+1]) [:#(type=Boolean)]
+Formulation of momentum balance [:#(type=Modelica.Fluid.Types.Dynamics)]
+Start value of mass flow rates [kg/s]
+Start value for p[1] at design inflow [Pa|bar]
+Start value for p[n+1] at design outflow [Pa|bar]
+Number of flow segments [:#(type=Integer)]
+Lengths along flow path [m]
+Momenta of flow segments [kg.m/s]
+Flow of momentum across boundaries [N]
+Pressure forces [N]
+der(Pressure forces) [N/s]
+= false to average upstream and downstream properties across flow segments [:#(type=Boolean)]
+= true to consider differences in flow of momentum through boundaries [:#(type=Boolean)]
+[kg/m3|g/cm3]
+[kg/m3|g/cm3]
+Actual density per segment [kg/m3|g/cm3]
+[Pa.s]
+[Pa.s]
+Actual viscosity per segment [Pa.s]
+pressure drop between states [Pa|bar]
+der(pressure drop between states) [Pa/s]
+Start of turbulent regime, depending on type of flow device [1]
+= true, if Reynolds numbers are included for plotting [:#(type=Boolean)]
+= true, if rho_nominal is used, otherwise computed from medium [:#(type=Boolean)]
+Nominal density (e.g., rho_liquidWater = 995, rho_air = 1.2) [kg/m3|g/cm3]
+= true, if mu_nominal is used, otherwise computed from medium [:#(type=Boolean)]
+Nominal dynamic viscosity (e.g., mu_liquidWater = 1e-3, mu_air = 1.8e-5) [Pa.s]
+pathLengths used internally; to be defined by extending class [m]
+Re_turbulent used internally; to be defined by extending class [1]
+Nominal pressure loss (only for nominal models) [Pa|bar]
+Nominal mass flow rate [kg/s]
+Within regularization if |m_flows| < m_flow_small (may be wider for large discontinuities in static head) [kg/s]
+Within regularization if |dp| < dp_small (may be wider for large discontinuities in static head) [Pa|bar]
+= true if the pressure loss does not depend on fluid states [:#(type=Boolean)]
+= true if the pressure loss is continuous around zero flow [:#(type=Boolean)]
+mean diameters between segments [m]
+pressure loss for nominal conditions [Pa|bar]
+Enthalpy flow rates of fluid across segment boundaries [W]
+Enthalpy flow rates of fluid across segment boundaries [W]
+Enthalpy flow rates of fluid across segment boundaries [W]
+mean velocities in flow segments [m/s]
+mean velocities in flow segments [m/s]
+Lengths along flow path [m]
+Differences in heights between flow segments [m]
+= true to use the HeatTransfer model [:#(type=Boolean)]
+Number of heat transfer segments [:#(type=Integer)]
+Heat transfer areas [m2]
+Heat transfer areas [m2]
+Heat flow rates [W]
+Heat flow rates [W]
+= true to use k value for thermal isolation [:#(type=Boolean)]
+Heat transfer coefficient to ambient [W/(m2.K)]
+Ambient temperature [K|degC]
+Heat flow rate (positive if flowing from outside into the component) [W]
+Heat flow rate (positive if flowing from outside into the component) [W]
+number of identical parallel flow devices
+Lengths along flow path [m]
+Lengths along flow path [m]
+
+
+Absolute pressure of medium [Pa|bar]
+der(Absolute pressure of medium) [Pa/s]
+Density of medium [kg/m3|g/cm3]
+Temperature of medium [K|degC]
+der(Temperature of medium) [K/s]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Specific internal energy of medium [J/kg]
+der(Specific internal energy of medium) [m2/s3]
+Gas constant (of mixture if applicable) [J/(kg.K)]
+Molar mass (of mixture or single fluid) [kg/mol]
+= true if StateSelect.prefer shall be used for the independent property variables of the medium [:#(type=Boolean)]
+If true, and reducedX = true, the last element of X will be computed from the other ones [:#(type=Boolean)]
+Temperature of medium in [degC] [degC;]
+Absolute pressure of medium in [bar] [bar]
+Absolute pressure of medium [Pa|bar]
+der(Absolute pressure of medium) [Pa/s]
+Density of medium [kg/m3|g/cm3]
+Temperature of medium [K|degC]
+der(Temperature of medium) [K/s]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Specific internal energy of medium [J/kg]
+der(Specific internal energy of medium) [m2/s3]
+Gas constant (of mixture if applicable) [J/(kg.K)]
+Molar mass (of mixture or single fluid) [kg/mol]
+= true if StateSelect.prefer shall be used for the independent property variables of the medium [:#(type=Boolean)]
+If true, and reducedX = true, the last element of X will be computed from the other ones [:#(type=Boolean)]
+Temperature of medium in [degC] [degC;]
+Absolute pressure of medium in [bar] [bar]
+Absolute pressure of medium [Pa|bar]
+der(Absolute pressure of medium) [Pa/s]
+Density of medium [kg/m3|g/cm3]
+Temperature of medium [K|degC]
+der(Temperature of medium) [K/s]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Specific internal energy of medium [J/kg]
+der(Specific internal energy of medium) [m2/s3]
+Gas constant (of mixture if applicable) [J/(kg.K)]
+Molar mass (of mixture or single fluid) [kg/mol]
+= true if StateSelect.prefer shall be used for the independent property variables of the medium [:#(type=Boolean)]
+If true, and reducedX = true, the last element of X will be computed from the other ones [:#(type=Boolean)]
+Temperature of medium in [degC] [degC;]
+Absolute pressure of medium in [bar] [bar]
+Absolute pressure of medium [Pa|bar]
+der(Absolute pressure of medium) [Pa/s]
+Density of medium [kg/m3|g/cm3]
+Temperature of medium [K|degC]
+der(Temperature of medium) [K/s]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Specific internal energy of medium [J/kg]
+der(Specific internal energy of medium) [m2/s3]
+Gas constant (of mixture if applicable) [J/(kg.K)]
+Molar mass (of mixture or single fluid) [kg/mol]
+= true if StateSelect.prefer shall be used for the independent property variables of the medium [:#(type=Boolean)]
+If true, and reducedX = true, the last element of X will be computed from the other ones [:#(type=Boolean)]
+Temperature of medium in [degC] [degC;]
+Absolute pressure of medium in [bar] [bar]
+[s]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

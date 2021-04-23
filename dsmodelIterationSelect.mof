@@ -1,0 +1,7 @@
+model dsmodelIterationSelect
+  extends CourseExamples.Workshop18.Linearization.HSN;
+  annotation(__Dymola_SimulationIterationVariables={"tank.ports[2].p", 
+  "tank.ports[1].p", "valve.port_b.p", "radiator.mediums[1].p", "tank.U", 
+  "tank.m", "tank.medium.T", "tank.level", "pump.medium.T", "valve.filter.x[2]",
+   "pipe.mediums[2].p", "pipe.mediums[1].p", "heater.mediums[1].p", "pump.N"});
+end dsmodelIterationSelect;
